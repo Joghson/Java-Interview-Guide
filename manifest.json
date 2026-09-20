@@ -1,0 +1,26 @@
+{
+  "name": "Java面试通 · 全栈工程师题库",
+  "short_name": "Java面试通",
+  "description": "多邻国风格的 Java 全栈工程师高频面试题刷题 App，10 大模块覆盖集合/JVM/并发/Spring/MySQL/Redis/分布式等核心考点",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#3E2723",
+  "theme_color": "#3E2723",
+  "lang": "zh-CN",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-144.png", "sizes": "144x144", "type": "image/png" }
+  ],
+  "shortcuts": [
+    {
+      "name": "每日挑战",
+      "short_name": "挑战",
+      "url": "./?shortcut=daily",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

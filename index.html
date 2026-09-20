@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#3E2723">
+  <title>Java面试通 · 全栈工程师题库</title>
+
+  <!-- ===== 内联滚动核心样式（最高优先级，确保任何环境都能滚动） ===== -->
+  <style>
+    html, body {
+      height: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important; /* 锁死外层，只让 .app 滚动 */
+    }
+    #app {
+      height: 100% !important;
+      max-height: 100vh !important;
+      min-height: 0 !important; /* 覆盖 style.css 的 min-height: 100vh */
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      touch-action: pan-y !important;
+    }
+    /* 允许内部所有元素接收触摸滚动 */
+    #app * { touch-action: pan-y; }
+  </style>
+
+  <!-- 禁止浏览器缓存，确保每次都加载最新版 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- ===== PWA 三件套 ===== -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+
+  <!-- iOS 专属：让 Safari 识别为"能加到主屏幕"的 App -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Java面试通">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- 顶部状态栏（学习页用） -->
+    <div class="topbar" id="topbar">
+      <div class="brand"><span class="logo">☕</span> Java面试通</div>
+      <div class="stats">
+        <div class="stat-pill streak"><span class="icon">🔥</span><span id="stat-streak">0</span></div>
+        <div class="stat-pill gem"><span class="icon">💎</span><span id="stat-gem">0</span></div>
+        <div class="stat-pill heart"><span class="icon">❤️</span><span id="stat-heart">5</span></div>
+      </div>
+    </div>
+
+    <!-- ============ 视图1：学习路径 ============ -->
+    <div class="view active" id="view-learn">
+      <div class="hero">
+        <h2 id="hero-greeting">准备好刷题了吗？</h2>
+        <p>每天5分钟，吃透Java全栈面试高频题</p>
+        <div class="daily-goal">
+          <div style="position:relative;">
+            <svg class="ring" width="44" height="44" viewBox="0 0 44 44">
+              <circle class="track" cx="22" cy="22" r="18"></circle>
+              <circle class="fill" id="goal-ring" cx="22" cy="22" r="18"
+                stroke-dasharray="113" stroke-dashoffset="113"></circle>
+            </svg>
+            <span class="ring-label" id="goal-pct">0%</span>
+          </div>
+          <div class="goal-text">
+            <b id="goal-done">0</b> / <span id="goal-total">10</span> 题 · 今日目标
+          </div>
+        </div>
+      </div>
+
+      <!-- 每日挑战 -->
+      <div class="daily-card" id="daily-card">
+        <div class="dc-icon">🎯</div>
+        <div class="dc-text">
+          <div class="dc-title">每日挑战</div>
+          <div class="dc-sub">随机抽题，检验今日学习成果</div>
+        </div>
+        <div class="dc-arrow">›</div>
+      </div>
+
+      <!-- 学习路径（动态渲染） -->
+      <div class="path" id="path"></div>
+    </div>
+
+    <!-- ============ 视图2：答题 ============ -->
+    <div class="view" id="view-quiz">
+      <div class="quiz-header" id="quiz-header">
+        <button class="back" id="quiz-back">✕</button>
+        <div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div>
+        <div class="q-counter" id="q-counter">1/5</div>
+      </div>
+      <div class="quiz-body" id="quiz-body">
+        <!-- 动态渲染题目 -->
+      </div>
+
+      <!-- 反馈条 -->
+      <div class="feedback" id="feedback">
+        <div class="fb-title" id="fb-title"></div>
+        <div class="fb-detail" id="fb-detail"></div>
+      </div>
+
+      <!-- 底部操作 -->
+      <div class="quiz-footer" id="quiz-footer">
+        <button class="btn btn-secondary" id="btn-skip">跳过</button>
+        <button class="btn btn-primary" id="btn-check" disabled>检查</button>
+      </div>
+    </div>
+
+    <!-- ============ 视图3：个人中心 ============ -->
+    <div class="view" id="view-profile">
+      <div class="profile-header">
+        <div class="profile-avatar">👨‍💻</div>
+        <div class="profile-name">Java 全栈工程师</div>
+        <div class="profile-title" id="profile-title">Lv.1 入门菜鸟</div>
+      </div>
+
+      <div class="profile-stats">
+        <div class="pstat"><div class="num" id="p-xp">0</div><div class="lbl">总经验</div></div>
+        <div class="pstat"><div class="num" id="p-done">0</div><div class="lbl">已答题</div></div>
+        <div class="pstat"><div class="num" id="p-acc">0%</div><div class="lbl">正确率</div></div>
+      </div>
+
+      <div class="section-title">成就徽章</div>
+      <div class="achievements" id="achievements"></div>
+
+      <div class="section-title">模块进度</div>
+      <div class="module-progress-list" id="module-progress"></div>
+
+      <button class="reset-btn" id="btn-reset">重置学习进度</button>
+    </div>
+
+    <!-- ============ 底部导航 ============ -->
+    <div class="tabbar">
+      <button class="tab active" data-view="learn">
+        <span class="t-icon">🏠</span><span>学习</span>
+      </button>
+      <button class="tab" data-view="profile">
+        <span class="t-icon">👤</span><span>我的</span>
+      </button>
+    </div>
+
+  </div>
+
+  <script src="js/data.js?v=4"></script>
+  <script src="js/app.js?v=4"></script>
+
+  <!-- ===== Service Worker 注册 + 自动更新检测 ===== -->
+  <script>
+    if ("serviceWorker" in navigator && (location.hostname === "localhost" || location.protocol === "https:")) {
+      window.addEventListener("load", async () => {
+        // 先清掉所有旧 SW 和缓存，确保加载最新版
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r => r.unregister()));
+        } catch(e) {}
+        try {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        } catch(e) {}
+
+        navigator.serviceWorker.register("sw.js?v=4")
+          .then((reg) => {
+            console.log("✅ SW 已注册", reg.scope);
+            reg.addEventListener("updatefound", () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener("statechange", () => {
+                if (newWorker.state === "activated" && navigator.serviceWorker.controller) {
+                  window.location.reload();
+                }
+              });
+            });
+          })
+          .catch((err) => console.warn("⚠️ SW 注册失败", err));
+
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          window.location.reload();
+        });
+      });
+    }
+  </script>
+</body>
+</html>
