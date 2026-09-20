@@ -1,0 +1,5 @@
+.uploads/
+.trae-html-share-packages/
+*.zip
+node_modules/
+.git/
