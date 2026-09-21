@@ -1,6 +1,6 @@
 // ============================================================
 // Java 全栈面试题库 - 多邻国风格
-// 涵盖：Java基础/集合、JVM、并发、Spring、MySQL、Redis、分布式、算法设计模式、网络OS、工程化
+// 每个模块拆成多个小关卡，按难度递增，降低单关压力
 // 答案设计原则：口诀化、类比化、一句话抓重点，便于"易吸收"
 // ============================================================
 
@@ -12,53 +12,9 @@ const QUESTION_BANK = [
     color: "#58CC02",
     lessons: [
       {
-        id: "java-coll-1",
-        title: "HashMap 底层原理",
+        id: "java-base-1",
+        title: "String 不可变",
         questions: [
-          {
-            type: "flashcard",
-            q: "HashMap 底层数据结构是什么？",
-            a: "JDK1.8 后 = 数组 + 链表 + 红黑树。\n数组是主体(桶)，hash冲突时挂链表，链表长度>8且数组长度≥64时转红黑树。",
-            tip: "记：数组当货架，冲突串成链，太长变红黑树"
-          },
-          {
-            type: "flashcard",
-            q: "HashMap 为什么线程不安全？",
-            a: "多线程同时 put 可能导致：1)数据覆盖 2)1.7头插法成环死循环 3)size计算不准。\n并发场景用 ConcurrentHashMap。",
-            tip: "记：put无锁，互相覆盖；1.7还会成环"
-          },
-          {
-            type: "choice",
-            q: "HashMap 默认初始容量是多少？",
-            options: ["8", "16", "32", "64"],
-            answer: 1,
-            tip: "默认16，负载因子0.75，扩容翻倍"
-          },
-          {
-            type: "flashcard",
-            q: "HashMap 的 hash 函数为什么要右移16位异或？",
-            a: "让高16位也参与运算，减少 hash 碰撞。\n公式：(h = key.hashCode()) ^ (h >>> 16)",
-            tip: "高16位^低16位，打散更均匀"
-          },
-          {
-            type: "flashcard",
-            q: "equals 和 hashCode 的关系？",
-            a: "1) equals 相等 → hashCode 必须相等\n2) hashCode 相等 → equals 不一定相等(哈希冲突)\n重写 equals 必须重写 hashCode，否则 HashMap 找不到。",
-            tip: "相等必同码，同码未必等"
-          },
-          {
-            type: "flashcard",
-            q: "ArrayList vs LinkedList 区别？",
-            a: "ArrayList：数组实现，随机访问O(1)，增删慢(要搬移)。\nLinkedList：双向链表，增删O(1)，访问O(n)。\n实际开发 ArrayList 用得多(CPU缓存友好)。",
-            tip: "查多ArrayList，改多LinkedList"
-          },
-          {
-            type: "choice",
-            q: "ArrayList 扩容机制是扩容到原来的几倍？",
-            options: ["1.5倍", "2倍", "3倍", "固定10"],
-            answer: 0,
-            tip: "oldCapacity + (oldCapacity >> 1) = 1.5倍"
-          },
           {
             type: "flashcard",
             q: "String 为什么不可变？",
@@ -74,28 +30,9 @@ const QUESTION_BANK = [
         ]
       },
       {
-        id: "java-coll-2",
-        title: "集合框架 & 泛型",
+        id: "java-base-2",
+        title: "集合框架概览",
         questions: [
-          {
-            type: "flashcard",
-            q: "fail-fast 是什么？",
-            a: "迭代器遍历时若集合被修改(modCount变化)，立刻抛 ConcurrentModificationException。\nArrayList/HashMap 都是 fail-fast。",
-            tip: "边遍历边改 → 抛异常"
-          },
-          {
-            type: "flashcard",
-            q: "fail-safe 是什么？",
-            a: "遍历的是集合副本，修改不影响遍历，不会抛异常。\n代表：ConcurrentHashMap、CopyOnWriteArrayList。\n缺点：数据可能不一致。",
-            tip: "CopyOnWrite：写时复制，读无锁"
-          },
-          {
-            type: "choice",
-            q: "Java 泛型的本质是？",
-            options: ["运行时类型检查", "编译期擦除", "动态代理", "反射"],
-            answer: 1,
-            tip: "Type Erasure 类型擦除，运行时都是Object"
-          },
           {
             type: "flashcard",
             q: "List、Set、Map 的区别？",
@@ -104,9 +41,84 @@ const QUESTION_BANK = [
           },
           {
             type: "flashcard",
+            q: "ArrayList vs LinkedList 区别？",
+            a: "ArrayList：数组实现，随机访问O(1)，增删慢(要搬移)。\nLinkedList：双向链表，增删O(1)，访问O(n)。\n实际开发 ArrayList 用得多(CPU缓存友好)。",
+            tip: "查多ArrayList，改多LinkedList"
+          },
+          {
+            type: "choice",
+            q: "ArrayList 扩容机制是扩容到原来的几倍？",
+            options: ["1.5倍", "2倍", "3倍", "固定10"],
+            answer: 0,
+            tip: "oldCapacity + (oldCapacity >> 1) = 1.5倍"
+          }
+        ]
+      },
+      {
+        id: "java-coll-1",
+        title: "HashMap 底层",
+        questions: [
+          {
+            type: "flashcard",
+            q: "HashMap 底层数据结构是什么？",
+            a: "JDK1.8 后 = 数组 + 链表 + 红黑树。\n数组是主体(桶)，hash冲突时挂链表，链表长度>8且数组长度≥64时转红黑树。",
+            tip: "记：数组当货架，冲突串成链，太长变红黑树"
+          },
+          {
+            type: "choice",
+            q: "HashMap 默认初始容量是多少？",
+            options: ["8", "16", "32", "64"],
+            answer: 1,
+            tip: "默认16，负载因子0.75，扩容翻倍"
+          },
+          {
+            type: "flashcard",
+            q: "HashMap 的 hash 函数为什么要右移16位异或？",
+            a: "让高16位也参与运算，减少 hash 碰撞。\n公式：(h = key.hashCode()) ^ (h >>> 16)",
+            tip: "高16位^低16位，打散更均匀"
+          }
+        ]
+      },
+      {
+        id: "java-coll-2",
+        title: "HashMap 进阶",
+        questions: [
+          {
+            type: "flashcard",
+            q: "HashMap 为什么线程不安全？",
+            a: "多线程同时 put 可能导致：1)数据覆盖 2)1.7头插法成环死循环 3)size计算不准。\n并发场景用 ConcurrentHashMap。",
+            tip: "put无锁，互相覆盖；1.7还会成环"
+          },
+          {
+            type: "flashcard",
+            q: "equals 和 hashCode 的关系？",
+            a: "1) equals 相等 → hashCode 必须相等\n2) hashCode 相等 → equals 不一定相等(哈希冲突)\n重写 equals 必须重写 hashCode，否则 HashMap 找不到。",
+            tip: "相等必同码，同码未必等"
+          },
+          {
+            type: "flashcard",
+            q: "fail-fast 和 fail-safe 区别？",
+            a: "fail-fast：遍历时集合被修改(modCount变化)立刻抛异常，ArrayList/HashMap都是。\nfail-safe：遍历副本，修改不影响遍历，ConcurrentHashMap、CopyOnWriteArrayList。",
+            tip: "fail-fast抛异常，fail-safe读副本"
+          },
+          {
+            type: "flashcard",
             q: "TreeMap 和 HashMap 区别？",
             a: "HashMap：哈希表，O(1)，无序。\nTreeMap：红黑树，O(logN)，key有序。\n需要排序用 TreeMap。",
             tip: "要快用HashMap，要序用TreeMap"
+          }
+        ]
+      },
+      {
+        id: "java-coll-3",
+        title: "泛型原理",
+        questions: [
+          {
+            type: "choice",
+            q: "Java 泛型的本质是？",
+            options: ["运行时类型检查", "编译期擦除", "动态代理", "反射"],
+            answer: 1,
+            tip: "Type Erasure 类型擦除，运行时都是Object"
           }
         ]
       }
@@ -121,7 +133,7 @@ const QUESTION_BANK = [
     lessons: [
       {
         id: "jvm-1",
-        title: "内存结构 & GC",
+        title: "内存区域",
         questions: [
           {
             type: "flashcard",
@@ -141,7 +153,13 @@ const QUESTION_BANK = [
             options: ["10", "15", "20", "30"],
             answer: 1,
             tip: "-XX:MaxTenuringThreshold 默认15"
-          },
+          }
+        ]
+      },
+      {
+        id: "jvm-2",
+        title: "GC 算法",
+        questions: [
           {
             type: "flashcard",
             q: "哪些是 GC Roots？",
@@ -159,7 +177,13 @@ const QUESTION_BANK = [
             q: "CMS 和 G1 的区别？",
             a: "CMS：并发标记清除，老年代，低延迟但有碎片。\nG1：分Region，可预测停顿时间，整体标记整理+局部复制。\nJDK9+ G1 是默认。",
             tip: "CMS低延迟有碎片，G1可预测停顿"
-          },
+          }
+        ]
+      },
+      {
+        id: "jvm-3",
+        title: "引用与类加载",
+        questions: [
           {
             type: "flashcard",
             q: "强/软/弱/虚引用区别？",
@@ -178,7 +202,13 @@ const QUESTION_BANK = [
             options: ["先自己再父", "先父再自己", "随机", "同级竞争"],
             answer: 1,
             tip: "向上委托父加载器，父加载不了才自己加载"
-          },
+          }
+        ]
+      },
+      {
+        id: "jvm-4",
+        title: "OOM 排查",
+        questions: [
           {
             type: "flashcard",
             q: "OOM 怎么排查？",
@@ -198,7 +228,7 @@ const QUESTION_BANK = [
     lessons: [
       {
         id: "conc-1",
-        title: "锁与线程池",
+        title: "锁基础",
         questions: [
           {
             type: "flashcard",
@@ -217,7 +247,13 @@ const QUESTION_BANK = [
             q: "volatile 的作用？",
             a: "1)保证可见性(MESI缓存一致性协议，写回主存)\n2)禁止指令重排(内存屏障)\n3)不保证原子性(i++不行)。\n常用于状态标志位。",
             tip: "可见+有序，不保证原子"
-          },
+          }
+        ]
+      },
+      {
+        id: "conc-2",
+        title: "线程池",
+        questions: [
           {
             type: "choice",
             q: "线程池核心参数有几个？",
@@ -236,7 +272,13 @@ const QUESTION_BANK = [
             q: "四种拒绝策略？",
             a: "1)AbortPolicy：抛异常(默认)\n2)CallerRunsPolicy：调用者线程执行\n3)DiscardPolicy：直接丢弃\n4)DiscardOldestPolicy：丢队列最老的",
             tip: "抛/调者执行/丢/丢最老"
-          },
+          }
+        ]
+      },
+      {
+        id: "conc-3",
+        title: "并发工具",
+        questions: [
           {
             type: "flashcard",
             q: "ConcurrentHashMap 1.8 原理？",
@@ -275,7 +317,7 @@ const QUESTION_BANK = [
     lessons: [
       {
         id: "spring-1",
-        title: "IoC & AOP & 事务",
+        title: "IoC 基础",
         questions: [
           {
             type: "flashcard",
@@ -295,7 +337,13 @@ const QUESTION_BANK = [
             options: ["prototype", "singleton", "request", "session"],
             answer: 1,
             tip: "默认单例singleton，全容器一个实例"
-          },
+          }
+        ]
+      },
+      {
+        id: "spring-2",
+        title: "AOP 与事务",
+        questions: [
           {
             type: "flashcard",
             q: "AOP 实现原理？",
@@ -313,7 +361,13 @@ const QUESTION_BANK = [
             q: "事务失效的场景？",
             a: "1)方法非public\n2)同类内部方法调用(this调用不走代理)\n3)异常被try-catch吞了\n4)默认只回滚RuntimeException\n5)数据库引擎不支持事务(MyISAM)",
             tip: "非public、自调用、吞异常、非运行时异常"
-          },
+          }
+        ]
+      },
+      {
+        id: "spring-3",
+        title: "SpringBoot 核心",
+        questions: [
           {
             type: "flashcard",
             q: "SpringBoot 自动装配原理？",
@@ -335,8 +389,8 @@ const QUESTION_BANK = [
         ]
       },
       {
-        id: "spring-2",
-        title: "SpringCloud 微服务",
+        id: "spring-4",
+        title: "SpringCloud",
         questions: [
           {
             type: "flashcard",
@@ -376,7 +430,7 @@ const QUESTION_BANK = [
     lessons: [
       {
         id: "mysql-1",
-        title: "索引 & 事务 & 锁",
+        title: "索引基础",
         questions: [
           {
             type: "flashcard",
@@ -396,7 +450,13 @@ const QUESTION_BANK = [
             options: ["WHERE b=1", "WHERE a=1 AND c=2", "WHERE a=1 AND b=2", "WHERE c=3"],
             answer: 2,
             tip: "从最左列开始匹配，中间不能断"
-          },
+          }
+        ]
+      },
+      {
+        id: "mysql-2",
+        title: "事务与隔离",
+        questions: [
           {
             type: "flashcard",
             q: "事务的 ACID？",
@@ -420,7 +480,13 @@ const QUESTION_BANK = [
             q: "redo log 和 undo log 区别？",
             a: "redo log：物理日志，记录数据页修改，保证持久性(crash-safe)，WAL预写。\nundo log：逻辑日志，记录反向操作，保证原子性(回滚)，支持MVCC。",
             tip: "redo重做保持久，undo回滚保原子"
-          },
+          }
+        ]
+      },
+      {
+        id: "mysql-3",
+        title: "优化与锁",
+        questions: [
           {
             type: "flashcard",
             q: "慢查询怎么优化？",
@@ -452,7 +518,7 @@ const QUESTION_BANK = [
     lessons: [
       {
         id: "redis-1",
-        title: "数据结构 & 缓存问题",
+        title: "数据结构",
         questions: [
           {
             type: "flashcard",
@@ -465,13 +531,32 @@ const QUESTION_BANK = [
             q: "Redis 为什么快？",
             a: "1)纯内存操作\n2)单线程(无锁竞争，避免上下文切换)\n3)IO多路复用(epoll)，一个线程处理多连接\n4)高效数据结构(跳表、压缩列表)",
             tip: "内存+单线程+IO多路复用"
-          },
+          }
+        ]
+      },
+      {
+        id: "redis-2",
+        title: "持久化",
+        questions: [
           {
             type: "flashcard",
             q: "RDB 和 AOF 区别？",
             a: "RDB：快照，二进制，恢复快，可能丢数据。\nAOF：追加命令日志，数据安全，文件大恢复慢。\n生产一般混合持久化(RDB头+AOF尾)。",
             tip: "RDB快但丢数据，AOF全但慢"
           },
+          {
+            type: "choice",
+            q: "Redis 过期键删除策略？",
+            options: ["只定期删除", "只惰性删除", "定期+惰性", "立即删除"],
+            answer: 2,
+            tip: "定期扫描 + 访问时惰性删除"
+          }
+        ]
+      },
+      {
+        id: "redis-3",
+        title: "缓存问题",
+        questions: [
           {
             type: "flashcard",
             q: "缓存穿透是什么？怎么解决？",
@@ -489,19 +574,18 @@ const QUESTION_BANK = [
             q: "缓存雪崩是什么？怎么解决？",
             a: "大量key同时过期，或Redis宕机，请求全打DB。\n解决：1)过期时间加随机值\n2)Redis集群高可用\n3)限流降级。",
             tip: "集体过期雪崩 → 随机过期+集群+限流"
-          },
+          }
+        ]
+      },
+      {
+        id: "redis-4",
+        title: "分布式锁",
+        questions: [
           {
             type: "flashcard",
             q: "Redis 分布式锁怎么实现？",
             a: "1)set key value NX EX 30 (原子加锁+过期)\n2)value用唯一标识(uuid)，解锁时判断是自己的锁再删\n3)解锁用Lua脚本保证原子性\n4)续期用看门狗(Redisson)。",
             tip: "setnx+过期，唯一value，Lua删，看门狗续期"
-          },
-          {
-            type: "choice",
-            q: "Redis 过期键删除策略？",
-            options: ["只定期删除", "只惰性删除", "定期+惰性", "立即删除"],
-            answer: 2,
-            tip: "定期扫描 + 访问时惰性删除"
           },
           {
             type: "flashcard",
@@ -522,7 +606,7 @@ const QUESTION_BANK = [
     lessons: [
       {
         id: "dist-1",
-        title: "分布式基础 & 消息队列",
+        title: "CAP & BASE",
         questions: [
           {
             type: "flashcard",
@@ -535,13 +619,25 @@ const QUESTION_BANK = [
             q: "BASE 理论？",
             a: "Basically Available(基本可用)、Soft state(软状态)、\nEventually consistent(最终一致)。\n是对CAP中AP的延伸，牺牲强一致换可用性。",
             tip: "基本可用、软状态、最终一致"
-          },
+          }
+        ]
+      },
+      {
+        id: "dist-2",
+        title: "分布式事务",
+        questions: [
           {
             type: "flashcard",
             q: "分布式事务解决方案？",
             a: "1)2PC/3PC：强一致，性能差，有阻塞\n2)TCC：Try-Confirm-Cancel，侵入性强\n3)本地消息表+MQ：最终一致，常用\n4)Seata：AT模式(自动补偿)，TCC、Saga",
             tip: "2PC强一致慢，TCC侵入强，MQ最终一致常用"
-          },
+          }
+        ]
+      },
+      {
+        id: "dist-3",
+        title: "消息队列",
+        questions: [
           {
             type: "flashcard",
             q: "消息队列怎么保证不重复消费？",
@@ -566,7 +662,13 @@ const QUESTION_BANK = [
             options: ["RabbitMQ", "Kafka", "RocketMQ", "一样"],
             answer: 1,
             tip: "Kafka吞吐量最高，适合日志大数据"
-          },
+          }
+        ]
+      },
+      {
+        id: "dist-4",
+        title: "服务治理",
+        questions: [
           {
             type: "flashcard",
             q: "什么是服务雪崩？",
@@ -586,7 +688,7 @@ const QUESTION_BANK = [
     lessons: [
       {
         id: "algo-1",
-        title: "排序 & 设计模式",
+        title: "排序算法",
         questions: [
           {
             type: "flashcard",
@@ -600,7 +702,13 @@ const QUESTION_BANK = [
             options: ["快排", "堆排", "归并排序", "选择排序"],
             answer: 2,
             tip: "归并、冒泡、插入、基数是稳定的"
-          },
+          }
+        ]
+      },
+      {
+        id: "algo-2",
+        title: "单例与工厂",
+        questions: [
           {
             type: "flashcard",
             q: "单例模式的几种写法？",
@@ -612,7 +720,13 @@ const QUESTION_BANK = [
             q: "工厂模式有哪几种？",
             a: "1)简单工厂：一个工厂按类型创建，违背开闭\n2)工厂方法：一个产品一个工厂，开闭好，类多\n3)抽象工厂：创建产品族(多个相关产品)。\nSpring的BeanFactory就是工厂模式。",
             tip: "简单工厂→工厂方法→抽象工厂"
-          },
+          }
+        ]
+      },
+      {
+        id: "algo-3",
+        title: "代理与Spring模式",
+        questions: [
           {
             type: "flashcard",
             q: "代理模式和装饰器模式区别？",
@@ -638,7 +752,7 @@ const QUESTION_BANK = [
     lessons: [
       {
         id: "net-1",
-        title: "网络协议 & 操作系统",
+        title: "TCP 连接",
         questions: [
           {
             type: "flashcard",
@@ -657,7 +771,13 @@ const QUESTION_BANK = [
             q: "TIME_WAIT 为什么等 2MSL？",
             a: "1)保证最后一个ACK能到达(丢了可重传)\n2)让本次连接的所有报文在网络中消失，避免影响新连接。",
             tip: "等ACK到 + 报文消失"
-          },
+          }
+        ]
+      },
+      {
+        id: "net-2",
+        title: "HTTP 协议",
+        questions: [
           {
             type: "flashcard",
             q: "HTTP 和 HTTPS 区别？",
@@ -670,7 +790,13 @@ const QUESTION_BANK = [
             options: ["改用UDP", "多路复用", "去掉请求头", "改用明文"],
             answer: 1,
             tip: "多路复用、头部压缩、服务端推送"
-          },
+          }
+        ]
+      },
+      {
+        id: "net-3",
+        title: "操作系统",
+        questions: [
           {
             type: "flashcard",
             q: "进程和线程区别？",
@@ -701,8 +827,8 @@ const QUESTION_BANK = [
     color: "#FF9F1C",
     lessons: [
       {
-        id: "devops-1",
-        title: "Git & Maven & Docker",
+        id: "git-1",
+        title: "Git 基础",
         questions: [
           {
             type: "flashcard",
@@ -722,7 +848,13 @@ const QUESTION_BANK = [
             options: ["git reset", "git checkout -- <file>", "git revert", "git rm"],
             answer: 1,
             tip: "git checkout -- file 撤销工作区修改"
-          },
+          }
+        ]
+      },
+      {
+        id: "maven-1",
+        title: "Maven",
+        questions: [
           {
             type: "flashcard",
             q: "Maven 生命周期？",
@@ -734,7 +866,13 @@ const QUESTION_BANK = [
             q: "Maven 依赖冲突怎么解决？",
             a: "1)短路优先：路径近的优先\n2)声明优先：同路径下先声明的优先\n3)排除法：exclusion排除冲突依赖\n4)指定版本：dependencyManagement统一管理。",
             tip: "路径近优先，同路径先声明优先"
-          },
+          }
+        ]
+      },
+      {
+        id: "docker-1",
+        title: "Docker & K8s",
+        questions: [
           {
             type: "flashcard",
             q: "Docker 镜像、容器、仓库？",
