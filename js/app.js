@@ -561,11 +561,19 @@ function saveProfileCustom(data) {
 
 function applyProfileCustom() {
   const c = getProfileCustom();
-  const avatar = c.avatar || "👨‍💻";
   const name = c.name || "Java 全栈工程师";
-  $("#profile-avatar").textContent = avatar;
-  $("#profile-name").textContent = name;
+  const avatarEl = $("#profile-avatar");
   const bgEl = $("#profile-header-bg");
+
+  // 头像：自定义图片 > emoji
+  if (c.customAvatar) {
+    avatarEl.innerHTML = `<img src="${c.customAvatar}" style="width:88px;height:88px;border-radius:50%;object-fit:cover">`;
+  } else {
+    avatarEl.textContent = c.avatar || "👨‍💻";
+  }
+
+  $("#profile-name").textContent = name;
+
   if (c.customBg) {
     bgEl.style.background = `url(${c.customBg}) center/cover no-repeat`;
   } else {
@@ -580,6 +588,7 @@ function showEditCard() {
   const selectedName = c.name || "";
   const selectedBg = c.bg || 0;
   const hasCustomBg = !!c.customBg;
+  const hasCustomAvatar = !!c.customAvatar;
 
   const overlay = document.createElement("div");
   overlay.className = "edit-overlay";
@@ -590,8 +599,11 @@ function showEditCard() {
       <div class="ec-label">选择头像</div>
       <div class="avatar-grid">
         ${AVATARS.map(a => `
-          <div class="avatar-opt ${a === selectedAvatar ? "selected" : ""}" data-avatar="${a}">${a}</div>
+          <div class="avatar-opt ${!hasCustomAvatar && a === selectedAvatar ? "selected" : ""}" data-avatar="${a}">${a}</div>
         `).join("")}
+        <div class="avatar-opt avatar-upload ${hasCustomAvatar ? "selected" : ""}" id="avatar-custom" style="flex-direction:column;gap:0;font-size:10px">
+          ${hasCustomAvatar ? `<img src="${c.customAvatar}" style="width:100%;height:100%;border-radius:10px;object-fit:cover">` : '<span style="font-size:18px">📷</span><span style="color:#888">自定义</span>'}
+        </div>
       </div>
 
       <div class="ec-label">昵称</div>
@@ -614,20 +626,46 @@ function showEditCard() {
       </div>
     </div>
     <input type="file" id="bg-file-input" accept="image/*" style="display:none">
+    <input type="file" id="avatar-file-input" accept="image/*" style="display:none">
   `;
   document.body.appendChild(overlay);
 
   let curAvatar = selectedAvatar;
   let curBg = selectedBg;
   let curCustomBg = hasCustomBg ? c.customBg : null;
+  let curCustomAvatar = hasCustomAvatar ? c.customAvatar : null;
 
-  // 头像选择
-  overlay.querySelectorAll(".avatar-opt").forEach(opt => {
+  // emoji 头像选择
+  overlay.querySelectorAll(".avatar-opt[data-avatar]").forEach(opt => {
     opt.addEventListener("click", () => {
       overlay.querySelectorAll(".avatar-opt").forEach(o => o.classList.remove("selected"));
       opt.classList.add("selected");
       curAvatar = opt.dataset.avatar;
+      curCustomAvatar = null;
     });
+  });
+
+  // 自定义头像上传
+  const avatarFileInput = overlay.querySelector("#avatar-file-input");
+  overlay.querySelector("#avatar-custom").addEventListener("click", () => {
+    avatarFileInput.click();
+  });
+  avatarFileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("图片不能超过 2MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      curCustomAvatar = ev.target.result;
+      const el = overlay.querySelector("#avatar-custom");
+      overlay.querySelectorAll(".avatar-opt").forEach(o => o.classList.remove("selected"));
+      el.classList.add("selected");
+      el.innerHTML = `<img src="${curCustomAvatar}" style="width:100%;height:100%;border-radius:10px;object-fit:cover">`;
+    };
+    reader.readAsDataURL(file);
   });
 
   // 预设背景选择
@@ -673,6 +711,7 @@ function showEditCard() {
     const name = overlay.querySelector("#edit-name").value.trim() || "Java 全栈工程师";
     const data = { avatar: curAvatar, name: name, bg: curBg };
     if (curCustomBg) data.customBg = curCustomBg;
+    if (curCustomAvatar) data.customAvatar = curCustomAvatar;
     saveProfileCustom(data);
     applyProfileCustom();
     const session = getSession();
