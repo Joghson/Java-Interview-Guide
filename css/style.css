@@ -72,26 +72,19 @@ ul { list-style: none; }
   gap: 8px;
 }
 .topbar .brand {
-  font-weight: 800;
-  font-size: 15px;
-  background: linear-gradient(135deg, var(--duo-green), var(--duo-blue));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
 }
-.topbar .brand .logo { font-size: 18px; -webkit-text-fill-color: initial; }
+.topbar .brand .logo { font-size: 22px; }
 .topbar .stats {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 13px;
   font-weight: 700;
-  flex-wrap: nowrap;
-  overflow: hidden;
+  flex: 1;
+  justify-content: flex-end;
 }
 .stat-pill {
   display: flex;

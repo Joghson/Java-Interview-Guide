@@ -244,20 +244,8 @@ function showAuthSuccess(msg, isRegister) {
 
 // ---------- 顶部栏用户信息 ----------
 function updateTopbarUser() {
-  const session = getSession();
-  if (session) {
-    // 在顶部栏显示用户标识
-    let userTag = $("#stat-user");
-    if (!userTag) {
-      userTag = document.createElement("div");
-      userTag.id = "stat-user";
-      userTag.className = "stat-pill";
-      userTag.style.color = "var(--duo-blue)";
-      userTag.innerHTML = `<span class="icon">👤</span><span class="user-name">${session.nickname}</span>`;
-      $(".topbar .stats").prepend(userTag);
-    }
-    userTag.querySelector(".user-name").textContent = session.nickname;
-  }
+  // 不在顶部栏显示用户信息，仅在个人中心页显示
+  // 空函数，保留调用兼容性
 }
 
 // ---------- 退出登录 ----------
