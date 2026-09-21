@@ -582,6 +582,161 @@ function applyProfileCustom() {
   }
 }
 
+// ---------- 头像裁剪弹窗 ----------
+function showCropDialog(imgSrc, cropSize, callback) {
+  const overlay = document.createElement("div");
+  overlay.className = "crop-overlay";
+  overlay.innerHTML = `
+    <div class="crop-title">裁剪头像</div>
+    <div class="crop-hint">拖动调整位置 · 双指缩放</div>
+    <div class="crop-stage" id="crop-stage">
+      <img id="crop-img" src="${imgSrc}">
+    </div>
+    <div class="crop-btns">
+      <button class="btn btn-secondary" id="crop-cancel">取消</button>
+      <button class="btn btn-primary" id="crop-confirm">完成</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const stage = overlay.querySelector("#crop-stage");
+  const img = overlay.querySelector("#crop-img");
+  const stageW = cropSize;
+  const stageH = cropSize;
+
+  // 等图片加载
+  img.onload = () => {
+    const natW = img.naturalWidth;
+    const natH = img.naturalHeight;
+    // 初始缩放：让图片短边填满裁剪框
+    let scale = Math.max(stageW / natW, stageH / natH);
+    let minScale = scale; // 不能再缩小
+    let maxScale = scale * 4;
+    let offsetX = 0; // 相对于居中的偏移
+    let offsetY = 0;
+
+    function applyTransform() {
+      img.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scale})`;
+    }
+    applyTransform();
+
+    // ---- 单指拖拽 ----
+    let dragStartX = 0, dragStartY = 0;
+    let dragOffX = 0, dragOffY = 0;
+    let isDragging = false;
+
+    // ---- 双指缩放 ----
+    let pinchStartDist = 0;
+    let pinchStartScale = 1;
+
+    function getDist(t1, t2) {
+      const dx = t1.clientX - t2.clientX;
+      const dy = t1.clientY - t2.clientY;
+      return Math.hypot(dx, dy);
+    }
+
+    function getCenter(t1, t2) {
+      return { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 };
+    }
+
+    stage.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      if (e.touches.length === 1) {
+        isDragging = true;
+        dragStartX = e.touches[0].clientX;
+        dragStartY = e.touches[0].clientY;
+        dragOffX = offsetX;
+        dragOffY = offsetY;
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        pinchStartDist = getDist(e.touches[0], e.touches[1]);
+        pinchStartScale = scale;
+      }
+    }, { passive: false });
+
+    stage.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      if (e.touches.length === 1 && isDragging) {
+        const dx = e.touches[0].clientX - dragStartX;
+        const dy = e.touches[0].clientY - dragStartY;
+        // 限制拖拽范围，不能拖出裁剪框太多
+        const maxOff = (scale * Math.min(natW, natH)) / 2 - stageW / 2 + 60;
+        offsetX = Math.max(-maxOff, Math.min(maxOff, dragOffX + dx));
+        offsetY = Math.max(-maxOff, Math.min(maxOff, dragOffY + dy));
+        applyTransform();
+      } else if (e.touches.length === 2) {
+        const dist = getDist(e.touches[0], e.touches[1]);
+        const ratio = dist / pinchStartDist;
+        scale = Math.max(minScale, Math.min(maxScale, pinchStartScale * ratio));
+        applyTransform();
+      }
+    }, { passive: false });
+
+    stage.addEventListener("touchend", (e) => {
+      if (e.touches.length < 2) {
+        pinchStartDist = 0;
+      }
+      if (e.touches.length === 0) {
+        isDragging = false;
+      }
+    });
+
+    // 鼠标支持（桌面测试）
+    let mouseDown = false;
+    stage.addEventListener("mousedown", (e) => {
+      mouseDown = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      dragOffX = offsetX;
+      dragOffY = offsetY;
+    });
+    document.addEventListener("mousemove", (e) => {
+      if (!mouseDown) return;
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+      const maxOff = (scale * Math.min(natW, natH)) / 2 - stageW / 2 + 60;
+      offsetX = Math.max(-maxOff, Math.min(maxOff, dragOffX + dx));
+      offsetY = Math.max(-maxOff, Math.min(maxOff, dragOffY + dy));
+      applyTransform();
+    });
+    document.addEventListener("mouseup", () => { mouseDown = false; });
+
+    // ---- 确认裁剪 ----
+    overlay.querySelector("#crop-confirm").addEventListener("click", () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext("2d");
+
+      // 计算源图片中的裁剪区域
+      // stage 中心对应图片中心 + offset
+      // 裁剪框在 stage 中央 280x280，圆形
+      // 源区域 = stageW / scale 的像素对应原始像素
+      const srcCropW = stageW / scale;
+      const srcCropH = stageH / scale;
+      const srcCenterX = natW / 2 - offsetX / scale;
+      const srcCenterY = natH / 2 - offsetY / scale;
+      const sx = srcCenterX - srcCropW / 2;
+      const sy = srcCenterY - srcCropH / 2;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(128, 128, 128, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, sx, sy, srcCropW, srcCropH, 0, 0, 256, 256);
+      ctx.restore();
+
+      const result = canvas.toDataURL("image/jpeg", 0.85);
+      overlay.remove();
+      callback(result);
+    });
+
+    overlay.querySelector("#crop-cancel").addEventListener("click", () => {
+      overlay.remove();
+    });
+  };
+}
+
 function showEditCard() {
   const c = getProfileCustom();
   const selectedAvatar = c.avatar || "👨‍💻";
@@ -645,7 +800,7 @@ function showEditCard() {
     });
   });
 
-  // 自定义头像上传
+  // 自定义头像上传（带裁剪）
   const avatarFileInput = overlay.querySelector("#avatar-file-input");
   overlay.querySelector("#avatar-custom").addEventListener("click", () => {
     avatarFileInput.click();
@@ -653,17 +808,19 @@ function showEditCard() {
   avatarFileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      alert("图片不能超过 2MB");
+    if (file.size > 20 * 1024 * 1024) {
+      alert("图片不能超过 20MB");
       return;
     }
     const reader = new FileReader();
     reader.onload = (ev) => {
-      curCustomAvatar = ev.target.result;
-      const el = overlay.querySelector("#avatar-custom");
-      overlay.querySelectorAll(".avatar-opt").forEach(o => o.classList.remove("selected"));
-      el.classList.add("selected");
-      el.innerHTML = `<img src="${curCustomAvatar}" style="width:100%;height:100%;border-radius:10px;object-fit:cover">`;
+      showCropDialog(ev.target.result, 280, (cropped) => {
+        curCustomAvatar = cropped;
+        const el = overlay.querySelector("#avatar-custom");
+        overlay.querySelectorAll(".avatar-opt").forEach(o => o.classList.remove("selected"));
+        el.classList.add("selected");
+        el.innerHTML = `<img src="${cropped}" style="width:100%;height:100%;border-radius:10px;object-fit:cover">`;
+      });
     };
     reader.readAsDataURL(file);
   });
