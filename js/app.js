@@ -369,8 +369,33 @@ function showFeedback(correct, title, detail) {
   fb.className = "feedback show " + (correct ? "feedback-correct" : "feedback-wrong");
   $("#fb-title").innerHTML = (correct ? "✅" : "❌") + " " + title;
   $("#fb-detail").textContent = detail;
-  // 震动反馈（如支持）
   if (navigator.vibrate) navigator.vibrate(correct ? 20 : [30, 30, 30]);
+  if (correct) launchConfetti();
+}
+
+// 撒花特效
+function launchConfetti() {
+  let container = $(".confetti-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.className = "confetti-container";
+    document.body.appendChild(container);
+  }
+  const colors = ["#58CC02", "#1CB0F6", "#FF9600", "#FF4B4B", "#8458FC", "#FFC800"];
+  const shapes = ["50%", "2px", "0"];
+  for (let i = 0; i < 40; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti-piece";
+    piece.style.left = Math.random() * 100 + "%";
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+    piece.style.animationDelay = Math.random() * 0.5 + "s";
+    piece.style.animationDuration = (2 + Math.random() * 1.5) + "s";
+    piece.style.width = (6 + Math.random() * 8) + "px";
+    piece.style.height = piece.style.width;
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 3500);
+  }
 }
 
 function hideFeedback() {
@@ -381,12 +406,17 @@ function finishQuiz() {
   const total = quiz.questions.length;
   const acc = Math.round(quiz.correct / total * 100);
   const xpGained = quiz.correct * 10 + (acc === 100 ? 20 : 0);
+  const oldLevel = getLevel(state.xp).lv;
   state.xp += xpGained;
+  const newLevel = getLevel(state.xp).lv;
   if (quiz.type === "lesson" && acc >= 60) {
     state.completedLessons[quiz.lesson.id] = true;
     state.gems += 5;
   }
   saveState();
+  if (newLevel > oldLevel) {
+    setTimeout(() => showLevelUp(newLevel), 600);
+  }
 
   const body = $("#quiz-body");
   $("#quiz-header").style.display = "none";
@@ -476,6 +506,29 @@ $("#btn-reset").addEventListener("click", () => {
     alert("进度已重置");
   }
 });
+
+// ---------- 升级弹窗 ----------
+function showLevelUp(level) {
+  const titles = ["入门菜鸟", "初级开发", "中级工程师", "高级工程师", "架构师", "技术专家", "技术大牛"];
+  const title = titles[Math.min(level - 1, titles.length - 1)];
+  const overlay = document.createElement("div");
+  overlay.className = "levelup-overlay";
+  overlay.innerHTML = `
+    <div class="levelup-card">
+      <div class="lu-icon">🎉</div>
+      <div class="lu-title">Lv.${level} ${title}</div>
+      <div class="lu-sub">恭喜升级！继续加油 💪</div>
+      <button class="lu-btn">太棒了</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector(".lu-btn").addEventListener("click", () => {
+    overlay.style.animation = "fadeIn .3s reverse";
+    setTimeout(() => overlay.remove(), 300);
+  });
+  launchConfetti();
+  if (navigator.vibrate) navigator.vibrate([50, 50, 50, 50, 100]);
+}
 
 // ---------- 初始化 ----------
 renderLearn();
