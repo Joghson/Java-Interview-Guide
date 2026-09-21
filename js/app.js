@@ -500,12 +500,11 @@ function renderProfile() {
     `;
   }).join("");
 
-  // 用户信息 + 退出登录
+  // 用户信息
   const session = getSession();
   if (session) {
     $("#profile-name").textContent = session.nickname;
   }
-  addLogoutButton();
 }
 $("#btn-reset").addEventListener("click", () => {
   if (confirm("确定要重置所有学习进度吗？此操作不可恢复。")) {
@@ -518,20 +517,11 @@ $("#btn-reset").addEventListener("click", () => {
 });
 
 // ---------- 退出登录 ----------
-function addLogoutButton() {
-  const existing = $("#btn-logout");
-  if (existing) existing.remove();
-  const btn = document.createElement("button");
-  btn.id = "btn-logout";
-  btn.className = "logout-btn";
-  btn.textContent = "退出登录";
-  btn.addEventListener("click", () => {
-    if (confirm("确定退出登录吗？")) {
-      logout();
-    }
-  });
-  $("#view-profile").appendChild(btn);
-}
+$("#btn-logout").addEventListener("click", () => {
+  if (confirm("确定退出登录吗？")) {
+    logout();
+  }
+});
 
 // ---------- 升级弹窗 ----------
 function showLevelUp(level) {
