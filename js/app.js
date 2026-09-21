@@ -83,12 +83,17 @@ function getLevel(xp) {
 
 // ---------- 视图路由 ----------
 function showView(name) {
+  // 未登录时拦截到登录视图
+  if (name !== "auth" && !isLoggedIn()) {
+    initAuth();
+    return;
+  }
   $$(".view").forEach(v => v.classList.remove("active"));
   $(`#view-${name}`).classList.add("active");
   $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === name));
-  $("#topbar").style.display = name === "learn" ? "flex" : "none";
+  $("#topbar").style.display = (name === "learn" || name === "quiz") ? "flex" : (name === "auth" ? "none" : "flex");
   // 答题视图隐藏底部导航（有自己的操作条）
-  $(".tabbar").style.display = name === "quiz" ? "none" : "flex";
+  $(".tabbar").style.display = (name === "quiz" || name === "auth") ? "none" : "flex";
   document.getElementById("app").scrollTop = 0;
 }
 
@@ -494,9 +499,14 @@ function renderProfile() {
       </div>
     `;
   }).join("");
-}
 
-// ---------- 重置 ----------
+  // 用户信息 + 退出登录
+  const session = getSession();
+  if (session) {
+    $("#profile-name").textContent = session.nickname;
+  }
+  addLogoutButton();
+}
 $("#btn-reset").addEventListener("click", () => {
   if (confirm("确定要重置所有学习进度吗？此操作不可恢复。")) {
     localStorage.removeItem(STORAGE_KEY);
@@ -506,6 +516,22 @@ $("#btn-reset").addEventListener("click", () => {
     alert("进度已重置");
   }
 });
+
+// ---------- 退出登录 ----------
+function addLogoutButton() {
+  const existing = $("#btn-logout");
+  if (existing) existing.remove();
+  const btn = document.createElement("button");
+  btn.id = "btn-logout";
+  btn.className = "logout-btn";
+  btn.textContent = "退出登录";
+  btn.addEventListener("click", () => {
+    if (confirm("确定退出登录吗？")) {
+      logout();
+    }
+  });
+  $("#view-profile").appendChild(btn);
+}
 
 // ---------- 升级弹窗 ----------
 function showLevelUp(level) {
@@ -531,4 +557,11 @@ function showLevelUp(level) {
 }
 
 // ---------- 初始化 ----------
-renderLearn();
+(function init() {
+  if (isLoggedIn()) {
+    updateTopbarUser();
+    renderLearn();
+  } else {
+    initAuth();
+  }
+})();

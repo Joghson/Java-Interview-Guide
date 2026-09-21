@@ -799,3 +799,192 @@ ul { list-style: none; }
 .daily-card .dc-title { font-weight: 800; font-size: 16px; color: #b8651b; }
 .daily-card .dc-sub { font-size: 12px; color: #8a5a2b; }
 .daily-card .dc-arrow { color: #b8651b; font-size: 24px; font-weight: 800; }
+
+/* ---------- 登录/注册 ---------- */
+.auth-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
+  background: linear-gradient(160deg, #58CC02 0%, #46a302 30%, #2d8e5a 70%, #1a6b42 100%);
+  position: relative;
+  overflow: hidden;
+}
+.auth-screen::before {
+  content: "";
+  position: absolute;
+  top: 10%; right: -10%;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  animation: floatDeco 6s ease-in-out infinite;
+}
+.auth-screen::after {
+  content: "";
+  position: absolute;
+  bottom: 5%; left: -15%;
+  width: 150px; height: 150px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  animation: floatDeco 8s ease-in-out infinite reverse;
+}
+.auth-logo {
+  font-size: 64px;
+  margin-bottom: 12px;
+  animation: avatarFloat 3s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+}
+.auth-title {
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+.auth-sub {
+  color: rgba(255,255,255,0.8);
+  font-size: 14px;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+}
+.auth-form {
+  width: 100%;
+  max-width: 340px;
+  background: #fff;
+  border-radius: 24px;
+  padding: 28px 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 1;
+  animation: fadeIn .5s cubic-bezier(0.4,0,0.2,1);
+}
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-mid);
+  margin-bottom: 6px;
+}
+.form-input {
+  width: 100%;
+  height: 52px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 16px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--text-dark);
+  background: #fff;
+  transition: border-color .2s, box-shadow .2s;
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--duo-green);
+  box-shadow: 0 0 0 4px rgba(88,204,2,0.12);
+}
+.code-row {
+  display: flex;
+  gap: 10px;
+}
+.code-row .form-input { flex: 1; }
+.btn-code {
+  flex-shrink: 0;
+  height: 52px;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--duo-blue), var(--duo-blue-dark));
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  box-shadow: 0 4px 0 #0d7ab0;
+  transition: transform .1s;
+  white-space: nowrap;
+}
+.btn-code:active { transform: translateY(3px); box-shadow: 0 1px 0 #0d7ab0; }
+.btn-code:disabled {
+  background: #ccc;
+  box-shadow: 0 4px 0 #aaa;
+  cursor: not-allowed;
+}
+.auth-error {
+  display: none;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  background: #ffe5e5;
+  color: var(--duo-red-dark);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  animation: shakeWrong .3s ease;
+}
+.auth-submit {
+  width: 100%;
+  margin-top: 4px;
+}
+.auth-switch {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 14px;
+  color: var(--text-mid);
+}
+.auth-switch span {
+  color: var(--duo-green);
+  font-weight: 800;
+  cursor: pointer;
+}
+.auth-dev-tip {
+  margin-top: 16px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.auth-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 16px 28px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  z-index: 9999;
+  display: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  text-align: center;
+  max-width: 280px;
+}
+.auth-toast::before {
+  content: "验证码";
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+/* ---------- 退出登录按钮 ---------- */
+.logout-btn {
+  margin: 0 16px 16px;
+  width: calc(100% - 32px);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  border: 2px solid var(--border);
+  color: var(--text-mid);
+  font-weight: 700;
+  font-size: 14px;
+  transition: all .15s;
+}
+.logout-btn:active { transform: scale(0.97); }
