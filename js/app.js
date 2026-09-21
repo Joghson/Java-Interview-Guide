@@ -563,10 +563,15 @@ function applyProfileCustom() {
   const c = getProfileCustom();
   const avatar = c.avatar || "👨‍💻";
   const name = c.name || "Java 全栈工程师";
-  const bg = c.bg || 0;
   $("#profile-avatar").textContent = avatar;
   $("#profile-name").textContent = name;
-  $("#profile-header-bg").style.background = BG_THEMES[bg].gradient;
+  const bgEl = $("#profile-header-bg");
+  if (c.customBg) {
+    bgEl.style.background = `url(${c.customBg}) center/cover no-repeat`;
+  } else {
+    const bg = c.bg || 0;
+    bgEl.style.background = BG_THEMES[bg].gradient;
+  }
 }
 
 function showEditCard() {
@@ -574,6 +579,7 @@ function showEditCard() {
   const selectedAvatar = c.avatar || "👨‍💻";
   const selectedName = c.name || "";
   const selectedBg = c.bg || 0;
+  const hasCustomBg = !!c.customBg;
 
   const overlay = document.createElement("div");
   overlay.className = "edit-overlay";
@@ -594,8 +600,12 @@ function showEditCard() {
       <div class="ec-label">背景主题</div>
       <div class="bg-grid">
         ${BG_THEMES.map((b, i) => `
-          <div class="bg-opt ${i === selectedBg ? "selected" : ""}" data-bg="${i}" style="background:${b.gradient}"></div>
+          <div class="bg-opt ${!hasCustomBg && i === selectedBg ? "selected" : ""}" data-bg="${i}" style="background:${b.gradient}"></div>
         `).join("")}
+        <div class="bg-opt bg-upload ${hasCustomBg ? "selected" : ""}" id="bg-custom" style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px">
+          <span style="font-size:20px">📷</span>
+          <span style="font-size:10px;font-weight:700;color:#888">自定义</span>
+        </div>
       </div>
 
       <div class="ec-btns">
@@ -603,11 +613,13 @@ function showEditCard() {
         <button class="btn btn-primary" id="ec-save" style="flex:2">保存</button>
       </div>
     </div>
+    <input type="file" id="bg-file-input" accept="image/*" style="display:none">
   `;
   document.body.appendChild(overlay);
 
   let curAvatar = selectedAvatar;
   let curBg = selectedBg;
+  let curCustomBg = hasCustomBg ? c.customBg : null;
 
   // 头像选择
   overlay.querySelectorAll(".avatar-opt").forEach(opt => {
@@ -618,13 +630,37 @@ function showEditCard() {
     });
   });
 
-  // 背景选择
-  overlay.querySelectorAll(".bg-opt").forEach(opt => {
+  // 预设背景选择
+  overlay.querySelectorAll(".bg-opt[data-bg]").forEach(opt => {
     opt.addEventListener("click", () => {
       overlay.querySelectorAll(".bg-opt").forEach(o => o.classList.remove("selected"));
       opt.classList.add("selected");
       curBg = parseInt(opt.dataset.bg);
+      curCustomBg = null;
     });
+  });
+
+  // 自定义背景上传
+  const fileInput = overlay.querySelector("#bg-file-input");
+  overlay.querySelector("#bg-custom").addEventListener("click", () => {
+    fileInput.click();
+  });
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      alert("图片不能超过 3MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      curCustomBg = ev.target.result;
+      overlay.querySelectorAll(".bg-opt").forEach(o => o.classList.remove("selected"));
+      overlay.querySelector("#bg-custom").classList.add("selected");
+      overlay.querySelector("#bg-custom").style.background = `url(${curCustomBg}) center/cover no-repeat`;
+      overlay.querySelector("#bg-custom").innerHTML = "";
+    };
+    reader.readAsDataURL(file);
   });
 
   // 取消
@@ -635,9 +671,10 @@ function showEditCard() {
   // 保存
   overlay.querySelector("#ec-save").addEventListener("click", () => {
     const name = overlay.querySelector("#edit-name").value.trim() || "Java 全栈工程师";
-    saveProfileCustom({ avatar: curAvatar, name: name, bg: curBg });
+    const data = { avatar: curAvatar, name: name, bg: curBg };
+    if (curCustomBg) data.customBg = curCustomBg;
+    saveProfileCustom(data);
     applyProfileCustom();
-    // 更新 session 中的 nickname
     const session = getSession();
     if (session) {
       session.nickname = name;
