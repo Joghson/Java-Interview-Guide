@@ -89,10 +89,12 @@ function showView(name) {
     return;
   }
   $$(".view").forEach(v => v.classList.remove("active"));
-  $(`#view-${name}`).classList.add("active");
+  const viewEl = $(`#view-${name}`);
+  if (!viewEl) return;
+  viewEl.classList.add("active");
   $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === name));
-  $("#topbar").style.display = (name === "learn" || name === "quiz") ? "flex" : (name === "auth" ? "none" : "flex");
-  // 答题视图隐藏底部导航（有自己的操作条）
+  // auth 视图隐藏顶部栏和底部导航，其他视图都显示
+  $("#topbar").style.display = name === "auth" ? "none" : "flex";
   $(".tabbar").style.display = (name === "quiz" || name === "auth") ? "none" : "flex";
   document.getElementById("app").scrollTop = 0;
 }
@@ -100,7 +102,9 @@ function showView(name) {
 $$(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     const v = tab.dataset.view;
-    if (v === "profile") renderProfile();
+    if (v === "profile") {
+      try { renderProfile(); } catch(e) { console.error("renderProfile error:", e); }
+    }
     showView(v);
   });
 });
@@ -517,11 +521,14 @@ $("#btn-reset").addEventListener("click", () => {
 });
 
 // ---------- 退出登录 ----------
-$("#btn-logout").addEventListener("click", () => {
-  if (confirm("确定退出登录吗？")) {
-    logout();
-  }
-});
+const logoutBtn = $("#btn-logout");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    if (confirm("确定退出登录吗？")) {
+      logout();
+    }
+  });
+}
 
 // ---------- 升级弹窗 ----------
 function showLevelUp(level) {
