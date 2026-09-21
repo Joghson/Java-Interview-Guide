@@ -972,6 +972,109 @@ ul { list-style: none; }
   margin-bottom: 4px;
 }
 
+.profile-edit-hint {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- 编辑弹窗 ---------- */
+.edit-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn .3s;
+}
+.edit-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 28px 24px;
+  width: 90%;
+  max-width: 340px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: levelupPop .4s cubic-bezier(0.4,0,0.2,1);
+}
+.edit-card .ec-title {
+  font-size: 18px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.edit-card .ec-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-mid);
+  margin-bottom: 8px;
+}
+.edit-card .avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.edit-card .avatar-opt {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: #f5f5f5;
+  transition: all .15s;
+}
+.edit-card .avatar-opt:active { transform: scale(0.9); }
+.edit-card .avatar-opt.selected {
+  border-color: var(--duo-green);
+  background: var(--duo-green-bg);
+  transform: scale(1.1);
+}
+.edit-card .bg-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.edit-card .bg-opt {
+  height: 48px;
+  border-radius: 12px;
+  border: 3px solid transparent;
+  transition: all .15s;
+}
+.edit-card .bg-opt:active { transform: scale(0.92); }
+.edit-card .bg-opt.selected {
+  border-color: #fff;
+  box-shadow: 0 0 0 3px var(--duo-green), 0 4px 12px rgba(0,0,0,0.15);
+}
+.edit-card .ec-input {
+  width: 100%;
+  height: 48px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  font-size: 16px;
+  font-family: inherit;
+  margin-bottom: 20px;
+  outline: none;
+  transition: border-color .2s;
+}
+.edit-card .ec-input:focus {
+  border-color: var(--duo-green);
+  box-shadow: 0 0 0 4px rgba(88,204,2,0.12);
+}
+.edit-card .ec-btns {
+  display: flex;
+  gap: 12px;
+}
+
 /* ---------- 退出登录按钮 ---------- */
 .logout-btn {
   margin: 0 16px 16px;

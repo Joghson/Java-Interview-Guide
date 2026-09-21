@@ -504,11 +504,17 @@ function renderProfile() {
     `;
   }).join("");
 
-  // 用户信息
+  // 用户信息 + 自定义头像/名字/背景
   const session = getSession();
   if (session) {
-    $("#profile-name").textContent = session.nickname;
+    const custom = getProfileCustom();
+    if (custom.name) {
+      $("#profile-name").textContent = custom.name;
+    } else {
+      $("#profile-name").textContent = session.nickname;
+    }
   }
+  applyProfileCustom();
 }
 $("#btn-reset").addEventListener("click", () => {
   if (confirm("确定要重置所有学习进度吗？此操作不可恢复。")) {
@@ -529,6 +535,123 @@ if (logoutBtn) {
     }
   });
 }
+
+// ---------- 个人中心编辑：头像/名字/背景 ----------
+const PROFILE_KEY = "java_profile_custom";
+const AVATARS = ["👨‍💻","👩‍💻","🧑‍💻","👨‍💼","👩‍💼","🧑‍💼","👨‍🚀","👩‍🚀","🤓","😎","🧙‍♂️","🧙‍♀️","🐉","🦊","🐱","🐯","🚀","☕"];
+const BG_THEMES = [
+  { name: "翠绿", gradient: "linear-gradient(135deg, #58CC02 0%, #46a302 40%, #2d8e5a 70%, #1a6b42 100%)" },
+  { name: "深海", gradient: "linear-gradient(135deg, #1CB0F6 0%, #0996d6 40%, #0568a8 70%, #003d75 100%)" },
+  { name: "烈焰", gradient: "linear-gradient(135deg, #FF6B6B 0%, #FF4B4B 40%, #cc2020 70%, #8a0a0a 100%)" },
+  { name: "紫梦", gradient: "linear-gradient(135deg, #8458FC 0%, #6a3de0 40%, #4a1eab 70%, #2a0a6e 100%)" },
+  { name: "金辉", gradient: "linear-gradient(135deg, #FFC800 0%, #e0a800 40%, #b07a00 70%, #6a4a00 100%)" },
+  { name: "咖啡", gradient: "linear-gradient(135deg, #6F4E37 0%, #5a3d2a 40%, #3e2723 70%, #2a1a14 100%)" },
+  { name: "暗夜", gradient: "linear-gradient(135deg, #2c3e50 0%, #1a2530 40%, #0d1a25 70%, #050d12 100%)" },
+  { name: "樱花", gradient: "linear-gradient(135deg, #FFB3D9 0%, #FF80C0 40%, #e0569f 70%, #9c2a6e 100%)" },
+  { name: "森林", gradient: "linear-gradient(135deg, #2d8e5a 0%, #1a6b42 40%, #0d4a2e 70%, #052e1a 100%)" },
+];
+
+function getProfileCustom() {
+  try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveProfileCustom(data) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+}
+
+function applyProfileCustom() {
+  const c = getProfileCustom();
+  const avatar = c.avatar || "👨‍💻";
+  const name = c.name || "Java 全栈工程师";
+  const bg = c.bg || 0;
+  $("#profile-avatar").textContent = avatar;
+  $("#profile-name").textContent = name;
+  $("#profile-header-bg").style.background = BG_THEMES[bg].gradient;
+}
+
+function showEditCard() {
+  const c = getProfileCustom();
+  const selectedAvatar = c.avatar || "👨‍💻";
+  const selectedName = c.name || "";
+  const selectedBg = c.bg || 0;
+
+  const overlay = document.createElement("div");
+  overlay.className = "edit-overlay";
+  overlay.innerHTML = `
+    <div class="edit-card">
+      <div class="ec-title">编辑个人资料</div>
+
+      <div class="ec-label">选择头像</div>
+      <div class="avatar-grid">
+        ${AVATARS.map(a => `
+          <div class="avatar-opt ${a === selectedAvatar ? "selected" : ""}" data-avatar="${a}">${a}</div>
+        `).join("")}
+      </div>
+
+      <div class="ec-label">昵称</div>
+      <input type="text" class="ec-input" id="edit-name" placeholder="输入昵称" value="${selectedName}" maxlength="12">
+
+      <div class="ec-label">背景主题</div>
+      <div class="bg-grid">
+        ${BG_THEMES.map((b, i) => `
+          <div class="bg-opt ${i === selectedBg ? "selected" : ""}" data-bg="${i}" style="background:${b.gradient}"></div>
+        `).join("")}
+      </div>
+
+      <div class="ec-btns">
+        <button class="btn btn-secondary" id="ec-cancel" style="flex:1">取消</button>
+        <button class="btn btn-primary" id="ec-save" style="flex:2">保存</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  let curAvatar = selectedAvatar;
+  let curBg = selectedBg;
+
+  // 头像选择
+  overlay.querySelectorAll(".avatar-opt").forEach(opt => {
+    opt.addEventListener("click", () => {
+      overlay.querySelectorAll(".avatar-opt").forEach(o => o.classList.remove("selected"));
+      opt.classList.add("selected");
+      curAvatar = opt.dataset.avatar;
+    });
+  });
+
+  // 背景选择
+  overlay.querySelectorAll(".bg-opt").forEach(opt => {
+    opt.addEventListener("click", () => {
+      overlay.querySelectorAll(".bg-opt").forEach(o => o.classList.remove("selected"));
+      opt.classList.add("selected");
+      curBg = parseInt(opt.dataset.bg);
+    });
+  });
+
+  // 取消
+  overlay.querySelector("#ec-cancel").addEventListener("click", () => {
+    overlay.remove();
+  });
+
+  // 保存
+  overlay.querySelector("#ec-save").addEventListener("click", () => {
+    const name = overlay.querySelector("#edit-name").value.trim() || "Java 全栈工程师";
+    saveProfileCustom({ avatar: curAvatar, name: name, bg: curBg });
+    applyProfileCustom();
+    // 更新 session 中的 nickname
+    const session = getSession();
+    if (session) {
+      session.nickname = name;
+      setSession(session);
+    }
+    overlay.remove();
+    renderProfile();
+    launchConfetti();
+  });
+}
+
+// 点击头像/名字打开编辑
+$("#profile-avatar").addEventListener("click", showEditCard);
+$("#profile-name").addEventListener("click", showEditCard);
 
 // ---------- 升级弹窗 ----------
 function showLevelUp(level) {
