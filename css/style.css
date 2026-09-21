@@ -1106,8 +1106,26 @@ ul { list-style: none; }
   border-radius: 50%;
   overflow: hidden;
   background: #111;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.15), 0 0 0 9999px rgba(0,0,0,0.45);
+  /* 醒目白色边框 + 外部强暗化遮罩 */
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 5px rgba(0,0,0,0.6),
+    0 0 0 9999px rgba(0,0,0,0.7);
   touch-action: none;
+}
+.crop-stage::after {
+  /* 九宫格辅助线（参考微信/QQ） */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, transparent calc(33.33% - 0.5px), rgba(255,255,255,0.35) calc(33.33% - 0.5px), rgba(255,255,255,0.35) calc(33.33% + 0.5px), transparent calc(33.33% + 0.5px)),
+    linear-gradient(to right, transparent calc(66.66% - 0.5px), rgba(255,255,255,0.35) calc(66.66% - 0.5px), rgba(255,255,255,0.35) calc(66.66% + 0.5px), transparent calc(66.66% + 0.5px)),
+    linear-gradient(to bottom, transparent calc(33.33% - 0.5px), rgba(255,255,255,0.35) calc(33.33% - 0.5px), rgba(255,255,255,0.35) calc(33.33% + 0.5px), transparent calc(33.33% + 0.5px)),
+    linear-gradient(to bottom, transparent calc(66.66% - 0.5px), rgba(255,255,255,0.35) calc(66.66% - 0.5px), rgba(255,255,255,0.35) calc(66.66% + 0.5px), transparent calc(66.66% + 0.5px));
+  z-index: 10;
 }
 .crop-stage img {
   position: absolute;
