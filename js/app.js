@@ -366,12 +366,6 @@ function renderLearn() {
     unit.setAttribute("data-era", String(eraIdx));
     const doneInModule = module.lessons.filter(l => state.completedLessons[l.id]).length;
 
-    // 时代建筑水印：底层装饰，淡灰，随下滑出现
-    const eraBg = document.createElement("div");
-    eraBg.className = "era-bg";
-    eraBg.innerHTML = era.building;
-    unit.appendChild(eraBg);
-
     // 单元头
     const unitHeader = document.createElement("div");
     unitHeader.className = "unit-header" + (moduleLocked ? " locked" : "");
@@ -413,6 +407,46 @@ function renderLearn() {
       row.appendChild(node);
       path.appendChild(row);
     });
+
+    // 在该 module 的关卡节点之间散落 1-2 个时代建筑装饰（随机位置）
+    // 使用确定性伪随机（基于 module 索引）以保持稳定
+    const seed = mi * 7;
+    const decoCount = 1 + (mi % 2); // 1 或 2 个
+    // 每个 node-row 高度约 90px，unit header 约 80px
+    const headerH = 80;
+    const rowH = 90;
+    for (let k = 0; k < decoCount; k++) {
+      const deco = document.createElement("div");
+      deco.className = "era-decoration";
+      deco.innerHTML = era.building;
+      // 伪随机：基于 seed+k
+      const rnd1 = ((seed + k * 13) % 100) / 100;
+      const rnd2 = ((seed + k * 17 + 5) % 100) / 100;
+      const rnd3 = ((seed + k * 19 + 9) % 100) / 100;
+      // 宽度 70-110px
+      const w = 70 + Math.round(rnd1 * 40);
+      // 高度 60-90px
+      const h = 60 + Math.round(rnd2 * 30);
+      // 位置：相对 unit 顶部，落在第 1~N-1 个 node-row 之间
+      const totalRows = module.lessons.length;
+      const rowPos = 1 + Math.floor(rnd3 * Math.max(1, totalRows - 1));
+      const top = headerH + rowPos * rowH - h / 2 + (rnd1 - 0.5) * 30;
+      // 横向：左/中/右随机（避免与节点中心冲突）
+      const sideRnd = rnd1;
+      let left;
+      if (sideRnd < 0.33) left = 4 + rnd2 * 10;        // 偏左
+      else if (sideRnd < 0.66) left = 38 + rnd2 * 18;   // 中间
+      else left = 68 + rnd2 * 12;                       // 偏右
+      deco.style.width = w + "px";
+      deco.style.height = h + "px";
+      deco.style.left = left + "%";
+      deco.style.top = top + "px";
+      // 不同装饰的旋转和镜像
+      const rot = (rnd3 - 0.5) * 8;
+      const flip = rnd2 > 0.5 ? "scaleX(-1)" : "scaleX(1)";
+      deco.style.transform = `rotate(${rot}deg) ${flip}`;
+      unit.appendChild(deco);
+    }
   });
 }
 
