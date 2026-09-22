@@ -358,7 +358,7 @@ function renderLearn() {
       if (!prevAllDone) moduleLocked = true;
     }
 
-    // 单元标题
+    // 单元容器
     const unit = document.createElement("div");
     unit.className = "unit";
     const eraIdx = Math.min(mi, ERAS.length - 1);
@@ -366,30 +366,22 @@ function renderLearn() {
     unit.setAttribute("data-era", String(eraIdx));
     const doneInModule = module.lessons.filter(l => state.completedLessons[l.id]).length;
 
-    // 时代横幅（每个大关卡前显示，带标志性建筑）
-    const eraBanner = document.createElement("div");
-    eraBanner.className = "era-banner";
-    eraBanner.style.background = era.sky;
-    eraBanner.innerHTML = `
-      <div class="era-building">${era.building}</div>
-      <div class="era-info">
-        <div class="era-name">${era.name}</div>
-        <div class="era-desc">${era.desc}</div>
-      </div>
-      <div class="era-num">${String(eraIdx + 1).padStart(2, "0")}</div>
-    `;
-    unit.appendChild(eraBanner);
+    // 时代建筑水印：底层装饰，淡灰，随下滑出现
+    const eraBg = document.createElement("div");
+    eraBg.className = "era-bg";
+    eraBg.innerHTML = era.building;
+    unit.appendChild(eraBg);
 
     // 单元头
     const unitHeader = document.createElement("div");
     unitHeader.className = "unit-header" + (moduleLocked ? " locked" : "");
     unitHeader.innerHTML = `
-      <div class="u-icon">${module.icon}</div>
+      <div class="u-icon" style="background:${module.color}">${module.icon}</div>
       <div>
         <div class="u-title">${module.module}</div>
-        <div class="u-sub">${doneInModule}/${module.lessons.length} 关已通过</div>
+        <div class="u-sub">${doneInModule}/${module.lessons.length} 关 · ${era.name}</div>
       </div>
-      ${moduleLocked ? '<div class="u-lock">🔒</div>' : ""}
+      ${moduleLocked ? '<div class="u-lock">🔒</div>' : '<span class="era-tag">' + era.name + '</span>'}
     `;
     unit.appendChild(unitHeader);
     path.appendChild(unit);

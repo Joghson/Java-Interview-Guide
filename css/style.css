@@ -55,8 +55,8 @@ ul { list-style: none; }
   max-width: 480px;
   min-height: 100vh;
   margin: 0 auto;
-  /* 中性背景，由每个时代横幅带来色彩变化 */
-  background: #f5f3ef;
+  /* 中性浅灰背景，整体偏冷灰 */
+  background: #ececed;
   position: relative;
   padding-bottom: 72px;
   box-shadow: 0 0 40px rgba(0,0,0,0.06);
@@ -230,90 +230,39 @@ ul { list-style: none; }
   align-items: center;
   gap: 0;
 }
-.unit { width: 100%; position: relative; }
-
-/* ---------- 时代横幅 ---------- */
-.era-banner {
+.unit {
   width: 100%;
-  height: 120px;
   position: relative;
   overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  padding: 0 16px 12px;
-  margin-top: 4px;
 }
-.era-banner .era-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-.era-banner .era-sky {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-.era-banner .era-building {
+/* 时代建筑水印：每个 unit 内部底层装饰，淡灰，不抢眼 */
+.unit .era-bg {
   position: absolute;
   bottom: 0;
-  right: -8px;
-  height: 90px;
-  width: 70%;
-  z-index: 1;
-  opacity: 0.95;
+  right: -10px;
+  width: 75%;
+  height: 130px;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+  filter: grayscale(1);
 }
-.era-banner .era-info {
-  position: relative;
-  z-index: 2;
-  color: #fff;
-}
-.era-banner .era-name {
-  font-size: 18px;
-  font-weight: 800;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  letter-spacing: 1px;
-}
-.era-banner .era-desc {
-  font-size: 11px;
-  color: rgba(255,255,255,0.9);
-  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-  margin-top: 2px;
-}
-.era-banner .era-num {
-  position: absolute;
-  top: 8px; right: 14px;
-  z-index: 2;
-  color: rgba(255,255,255,0.5);
-  font-size: 36px;
-  font-weight: 900;
-  line-height: 1;
-}
+/* node-row 和 unit-header 都在上层 */
+.unit-header, .node-row { position: relative; z-index: 1; }
+
 .unit-header {
   background: var(--card);
   border: 2px solid var(--border);
   border-radius: var(--radius);
   padding: 14px 16px;
-  margin: 16px 0 10px;
+  margin: 16px 16px 10px;
   display: flex;
   align-items: center;
   gap: 12px;
   box-shadow: var(--shadow-lg), 0 2px 0 rgba(0,0,0,0.06);
   transition: transform .2s;
-  position: relative;
-  overflow: hidden;
 }
 .unit-header:active { transform: scale(0.98); }
-/* 时代纹理图案（在 unit-header 背景叠加） */
-.unit-header::after {
-  content: "";
-  position: absolute;
-  top: 0; right: 0;
-  width: 90px; height: 100%;
-  opacity: 0.18;
-  background-repeat: repeat;
-  background-size: 28px 28px;
-  pointer-events: none;
-}
 .unit-header .u-icon {
   width: 44px; height: 44px;
   border-radius: 14px;
@@ -321,13 +270,11 @@ ul { list-style: none; }
   font-size: 24px;
   color: #fff;
   box-shadow: 0 4px 0 rgba(0,0,0,0.18), 0 6px 14px rgba(0,0,0,0.18);
-  position: relative;
-  z-index: 1;
 }
-.unit-header .u-title { font-weight: 800; font-size: 16px; position: relative; z-index: 1; }
-.unit-header .u-sub { font-size: 12px; color: var(--text-mid); position: relative; z-index: 1; }
+.unit-header .u-title { font-weight: 800; font-size: 16px; }
+.unit-header .u-sub { font-size: 12px; color: var(--text-mid); }
 .unit-header.locked { opacity: 0.55; filter: grayscale(0.6); }
-.unit-header .u-lock { margin-left: auto; font-size: 18px; position: relative; z-index: 1; }
+.unit-header .u-lock { margin-left: auto; font-size: 18px; }
 .unit-header .era-tag {
   font-size: 10px;
   font-weight: 700;
@@ -335,67 +282,10 @@ ul { list-style: none; }
   border-radius: 999px;
   background: rgba(0,0,0,0.08);
   color: var(--text-mid);
-  position: relative;
-  z-index: 1;
   margin-left: auto;
   margin-right: 6px;
   letter-spacing: 0.5px;
 }
-
-/* === 时代纹理图案（SVG data URI，每个时代一种） === */
-/* 1. 原始时代：手印+圆点 */
-.unit[data-era="0"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><circle cx='6' cy='6' r='2' fill='%23553920'/><circle cx='20' cy='14' r='1.5' fill='%23553920'/><circle cx='10' cy='22' r='2' fill='%23553920'/><path d='M14 4 q3 0 3 3 v6 q0 2 2 2 q-2 0-2 2 v6 q0 3-3 3' fill='none' stroke='%23553920' stroke-width='1.5'/></svg>");
-}
-/* 2. 农耕时代：麦穗 */
-.unit[data-era="1"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><path d='M14 4 v20' stroke='%237a5a2a' stroke-width='1.2'/><path d='M14 8 l-4 -3 M14 8 l4 -3 M14 14 l-5 -3 M14 14 l5 -3 M14 20 l-4 -3 M14 20 l4 -3' stroke='%237a5a2a' stroke-width='1.2' fill='none'/></svg>");
-}
-/* 3. 古代文明：楔形/象形文字 */
-.unit[data-era="2"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><path d='M6 8 h8 M6 12 l8 4 M6 16 h8 M16 8 l6 0 M16 12 v6 M19 8 v6' stroke='%23a67a30' stroke-width='1.5' fill='none'/></svg>");
-}
-/* 4. 中世纪：盾牌十字 */
-.unit[data-era="3"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><path d='M14 4 l8 3 v6 q0 5-8 9 q-8-4-8-9 v-6 z' fill='none' stroke='%23483a2a' stroke-width='1.2'/><path d='M14 9 v6 M11 12 h6' stroke='%23483a2a' stroke-width='1.5'/></svg>");
-}
-/* 5. 大航海：罗盘波浪 */
-.unit[data-era="4"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><circle cx='14' cy='14' r='5' fill='none' stroke='%23285a8a' stroke-width='1.2'/><path d='M14 9 v10 M9 14 h10' stroke='%23285a8a' stroke-width='1'/><path d='M2 22 q4 -3 8 0 q4 3 8 0 q4 -3 8 0' fill='none' stroke='%23285a8a' stroke-width='1'/></svg>");
-}
-/* 6. 工业革命：齿轮 */
-.unit[data-era="5"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g fill='none' stroke='%23444' stroke-width='1.2'><circle cx='14' cy='14' r='4'/><path d='M14 4 v3 M14 21 v3 M4 14 h3 M21 14 h3 M7 7 l2 2 M19 19 l2 2 M21 7 l-2 2 M9 19 l-2 2'/></g></svg>");
-}
-/* 7. 蒸汽时代：活塞+蒸汽 */
-.unit[data-era="6"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><rect x='8' y='10' width='12' height='8' fill='none' stroke='%23556' stroke-width='1.2'/><path d='M14 4 q2 2 0 4 q-2 2 0 4' fill='none' stroke='%23556' stroke-width='1.2'/><path d='M20 14 h4' stroke='%23556' stroke-width='1.2'/></svg>");
-}
-/* 8. 电气时代：电波灯泡 */
-.unit[data-era="7"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><circle cx='14' cy='10' r='4' fill='none' stroke='%23a07515' stroke-width='1.2'/><path d='M11 14 h6 M13 14 v4 M15 14 v4' stroke='%23a07515' stroke-width='1.2'/><path d='M4 22 q4 -4 8 0 q4 4 8 0 q4 -4 8 0' fill='none' stroke='%23a07515' stroke-width='1'/></svg>");
-}
-/* 9. 信息时代：电路板 */
-.unit[data-era="8"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g fill='none' stroke='%231a8a3a' stroke-width='1.2'><path d='M4 4 h8 v6 M12 10 h8 M20 10 v8 M20 18 h-8 M12 18 v-8'/><circle cx='4' cy='4' r='1.5' fill='%231a8a3a'/><circle cx='20' cy='18' r='1.5' fill='%231a8a3a'/></g></svg>");
-}
-/* 10. 数字时代：二进制像素 */
-.unit[data-era="9"] .unit-header::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'><g fill='%231455aa'><rect x='4' y='4' width='3' height='3'/><rect x='10' y='4' width='3' height='3'/><rect x='16' y='10' width='3' height='3'/><rect x='22' y='16' width='3' height='3'/><rect x='4' y='16' width='3' height='3'/><rect x='16' y='22' width='3' height='3'/></g></svg>");
-}
-
-/* 时代纹理图标背景色变化 */
-.unit[data-era] .u-icon { position: relative; }
-.unit[data-era="0"] .u-icon { background: linear-gradient(135deg, #6b4a2a, #4a2f15) !important; }
-.unit[data-era="1"] .u-icon { background: linear-gradient(135deg, #8a6a30, #5e4520) !important; }
-.unit[data-era="2"] .u-icon { background: linear-gradient(135deg, #b58530, #7a5a20) !important; }
-.unit[data-era="3"] .u-icon { background: linear-gradient(135deg, #6a4a2a, #3e2723) !important; }
-.unit[data-era="4"] .u-icon { background: linear-gradient(135deg, #2a6a9a, #1a4570) !important; }
-.unit[data-era="5"] .u-icon { background: linear-gradient(135deg, #555, #2a2a2a) !important; }
-.unit[data-era="6"] .u-icon { background: linear-gradient(135deg, #5a6878, #34404a) !important; }
-.unit[data-era="7"] .u-icon { background: linear-gradient(135deg, #c08520, #7a5010) !important; }
-.unit[data-era="8"] .u-icon { background: linear-gradient(135deg, #1a8a3a, #0d4a20) !important; }
-.unit[data-era="9"] .u-icon { background: linear-gradient(135deg, #1455aa, #0d3070) !important; }
 
 .node-row {
   display: flex;
