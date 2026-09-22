@@ -61,6 +61,21 @@ function yesterdayStr() {
   return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
 }
 
+// ---------- Hero 主题色 ----------
+const HERO_THEME_KEY = "java_hero_theme";
+function getHeroTheme() {
+  return parseInt(localStorage.getItem(HERO_THEME_KEY)) || 0;
+}
+function setHeroTheme(t) {
+  localStorage.setItem(HERO_THEME_KEY, String(t));
+  const hero = $(".hero");
+  if (hero) hero.setAttribute("data-theme", String(t));
+}
+function cycleHeroTheme() {
+  const next = (getHeroTheme() + 1) % 6; // 0-5 共6个主题
+  setHeroTheme(next);
+}
+
 // ---------- 工具 ----------
 function $(sel, root = document) { return root.querySelector(sel); }
 function $$(sel, root = document) { return [...root.querySelectorAll(sel)]; }
@@ -125,6 +140,10 @@ function renderLearn() {
   $("#goal-ring").setAttribute("stroke-dasharray", circumference);
   $("#goal-ring").setAttribute("stroke-dashoffset", circumference * (1 - goalPct / 100));
 
+  // 应用 Hero 主题色
+  const hero = $(".hero");
+  if (hero) hero.setAttribute("data-theme", String(getHeroTheme()));
+
   // 问候语
   const h = new Date().getHours();
   const greet = h < 6 ? "夜深了，注意休息" : h < 12 ? "早上好，开始刷题吧" : h < 14 ? "午后好，刷几道题醒醒脑" : h < 18 ? "下午好，继续加油" : "晚上好，复盘今日所学";
@@ -134,23 +153,29 @@ function renderLearn() {
   const path = $("#path");
   path.innerHTML = "";
 
-  // 找到第一个未完成的lesson（当前节点）
-  const allLessons = [];
-  QUESTION_BANK.forEach(m => m.lessons.forEach(l => allLessons.push({ ...l, module: m.module, icon: m.icon, color: m.color })));
   let currentFound = false;
 
   QUESTION_BANK.forEach((module, mi) => {
+    // 判断该模块是否解锁：第一个模块默认解锁，其他模块需前置模块所有关卡完成
+    let moduleLocked = false;
+    if (mi > 0) {
+      const prevModule = QUESTION_BANK[mi - 1];
+      const prevAllDone = prevModule.lessons.every(l => state.completedLessons[l.id]);
+      if (!prevAllDone) moduleLocked = true;
+    }
+
     // 单元标题
     const unit = document.createElement("div");
     unit.className = "unit";
     const doneInModule = module.lessons.filter(l => state.completedLessons[l.id]).length;
     unit.innerHTML = `
-      <div class="unit-header">
+      <div class="unit-header${moduleLocked ? " locked" : ""}">
         <div class="u-icon" style="background:${module.color}">${module.icon}</div>
         <div>
           <div class="u-title">${module.module}</div>
           <div class="u-sub">${doneInModule}/${module.lessons.length} 关已通过</div>
         </div>
+        ${moduleLocked ? '<div class="u-lock">🔒</div>' : ""}
       </div>
     `;
     path.appendChild(unit);
@@ -161,13 +186,10 @@ function renderLearn() {
       row.className = "node-row " + (li % 2 === 0 ? "left" : "right");
 
       const isDone = !!state.completedLessons[lesson.id];
-      // 锁定条件：上一课未完成（同一模块内）
-      let isLocked = false;
-      if (!isDone) {
-        if (li > 0) {
-          isLocked = !state.completedLessons[module.lessons[li - 1].id];
-        }
-        // 第一个模块的第一课不锁
+      // 锁定条件：模块锁定 OR 上一课未完成
+      let isLocked = moduleLocked;
+      if (!isLocked && !isDone && li > 0) {
+        isLocked = !state.completedLessons[module.lessons[li - 1].id];
       }
       const isCurrent = !isDone && !isLocked && !currentFound;
       if (isCurrent) currentFound = true;
@@ -177,17 +199,19 @@ function renderLearn() {
       node.innerHTML = `
         <div class="n-icon">${isDone ? "⭐" : lesson.icon || module.icon}</div>
         <div class="n-title">${lesson.title}</div>
+        ${isLocked ? '<div class="n-lock">🔒</div>' : ""}
       `;
       if (!isLocked) {
         node.addEventListener("click", () => startLesson(lesson, module));
-      } else {
-        node.innerHTML += `<div style="position:absolute;font-size:18px;top:-4px;right:-4px;">🔒</div>`;
       }
       row.appendChild(node);
       path.appendChild(row);
     });
   });
 }
+
+// Hero 主题切换按钮
+$(".hero-theme-btn")?.addEventListener("click", cycleHeroTheme);
 
 // ---------- 答题流程 ----------
 let quiz = null; // 当前答题会话
