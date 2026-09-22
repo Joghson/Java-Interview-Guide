@@ -1304,3 +1304,4 @@ function showLevelUp(level) {
   }
 })();
 /* rebuild trigger */
+/* pages rebuild */
