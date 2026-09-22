@@ -3,7 +3,7 @@
    策略：HTML/CSS/JS 用 Network-First（保证拿到最新版），
         图标等静态资源用 Cache-First（速度快）
    ============================================================ */
-const CACHE_VERSION = "v6";
+const CACHE_VERSION = "v7";
 const CACHE_NAME = `java-interview-${CACHE_VERSION}`;
 
 // 预缓存（只缓存不会变的图标等静态资源）

@@ -125,6 +125,12 @@ $$(".tab").forEach(tab => {
 });
 
 // ---------- 渲染：学习路径 ----------
+// 时代映射：每个模块对应一个时代（从原始到数字）
+const ERAS = [
+  "原始时代", "农耕时代", "古代文明", "中世纪", "大航海",
+  "工业革命", "蒸汽时代", "电气时代", "信息时代", "数字时代"
+];
+
 function renderLearn() {
   // 顶部统计
   $("#stat-streak").textContent = state.streak;
@@ -167,14 +173,17 @@ function renderLearn() {
     // 单元标题
     const unit = document.createElement("div");
     unit.className = "unit";
+    const eraIdx = Math.min(mi, ERAS.length - 1);
+    unit.setAttribute("data-era", String(eraIdx));
     const doneInModule = module.lessons.filter(l => state.completedLessons[l.id]).length;
     unit.innerHTML = `
       <div class="unit-header${moduleLocked ? " locked" : ""}">
-        <div class="u-icon" style="background:${module.color}">${module.icon}</div>
+        <div class="u-icon">${module.icon}</div>
         <div>
           <div class="u-title">${module.module}</div>
-          <div class="u-sub">${doneInModule}/${module.lessons.length} 关已通过</div>
+          <div class="u-sub">${doneInModule}/${module.lessons.length} 关 · ${ERAS[eraIdx]}</div>
         </div>
+        <span class="era-tag">${ERAS[eraIdx]}</span>
         ${moduleLocked ? '<div class="u-lock">🔒</div>' : ""}
       </div>
     `;
