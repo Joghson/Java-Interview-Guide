@@ -1303,3 +1303,4 @@ function showLevelUp(level) {
     initAuth();
   }
 })();
+/* rebuild trigger */
