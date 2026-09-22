@@ -55,8 +55,8 @@ ul { list-style: none; }
   max-width: 480px;
   min-height: 100vh;
   margin: 0 auto;
-  /* 中性浅灰背景，整体偏冷灰 */
-  background: #ececed;
+  /* 中性暖灰背景，让彩色时代建筑更突出 */
+  background: #f0ede6;
   position: relative;
   padding-bottom: 72px;
   box-shadow: 0 0 40px rgba(0,0,0,0.06);
@@ -236,17 +236,16 @@ ul { list-style: none; }
   width: 100%;
   position: relative;
 }
-/* 时代建筑水印：散落在关卡空白处，淡灰，可点击彩蛋 */
+/* 时代建筑水印：散落在关卡空白处，淡色，可点击彩蛋 */
 .era-decoration {
   position: absolute;
   pointer-events: auto;
   z-index: 0;
-  opacity: 0.18;
-  filter: grayscale(1);
+  opacity: 0.4;
   cursor: pointer;
   transition: opacity .25s, transform .25s;
 }
-.era-decoration:hover { opacity: 0.32; }
+.era-decoration:hover { opacity: 0.6; }
 .era-decoration:active { transform: scale(0.92); }
 .era-decoration svg {
   width: 100%;
