@@ -319,6 +319,82 @@ const ERAS = [
   }
 ];
 
+// 每个时代的彩蛋文案（点击建筑随机弹出一条）
+const EGG_EMOJI = "🥚";
+const ERA_EGGS = [
+  [ // 0 原始时代
+    "原始人最早发明了 fire，程序员最早发明了 bug。",
+    "钻木取火需要耐心，等代码编译也一样。",
+    "那时人类已经会保存火种，比保存代码备份还认真。",
+    "山洞壁画是史上最早的 README，但没人看。"
+  ],
+  [ // 1 农耕时代
+    "种地要看节气，发版要看黄历。",
+    "麦浪起伏像极了线上 CPU 曲线。",
+    "农人施肥增产，程序员加注释减负。",
+    "春耕秋收 = 早高峰 debug，晚高峰 deploy。"
+  ],
+  [ // 2 古代文明
+    "金字塔造了 20 年，重构也写了 20 年。",
+    "象形文字难，正则表达式更难。",
+    "古代历法 = 最早的时间戳处理。",
+    "莎草纸是远古的版本控制，只可惜不能 diff。"
+  ],
+  [ // 3 中世纪
+    "骑士守誓约，接口守契约。",
+    "城堡防御要厚，防火墙要厚。",
+    "炼金术士是第一批「全栈」工程师。",
+    "中世纪的瘟疫 = 生产环境的内存泄漏。"
+  ],
+  [ // 4 大航海
+    "罗盘指向磁北，代码指向 main 函数。",
+    "航海日志 = git log，每条都重要。",
+    "船长怕风暴，运维怕高峰。",
+    "环游世界很难，但比环回依赖简单。"
+  ],
+  [ // 5 工业革命
+    "蒸汽机提高效率，IDE 自动补全也一样。",
+    "工厂流水线 = CI/CD 最早雏形。",
+    "机器换齿轮，重构换框架，都疼。",
+    "工业污染 = 代码屎山，都在悄悄积累。"
+  ],
+  [ // 6 蒸汽时代
+    "蒸汽火车跑得快，热加载也一样。",
+    "锅炉要烧水，容器要 docker。",
+    "汽笛一响干活，铃铛一响下班。",
+    "煤炭是燃料，咖啡是程序员的燃料。"
+  ],
+  [ // 7 电气时代
+    "灯泡亮起 = 控制台打印 console.log('hello')。",
+    "电网覆盖全球，互联网覆盖生活。",
+    "电费按度算，云费按算力算。",
+    "闪电是自然界的瞬间高并发。"
+  ],
+  [ // 8 信息时代
+    "服务器机房是数字时代的工厂。",
+    "网线一拔，恩断义绝。",
+    "蓝屏是程序员的工业革命。",
+    "机房空调比办公室空调重要。"
+  ],
+  [ // 9 数字时代
+    "云上什么都存，包括 bug。",
+    "AI 写代码：调试到 AI 自己都崩溃。",
+    "5G 很快，debug 很慢。",
+    "元宇宙里没人写注释，反正都是浮云。"
+  ]
+];
+
+// 通用彩蛋（不绑定时代，随机补充）
+const GENERAL_EGGS = [
+  "世界上第一个 bug，真的是一只虫子。",
+  "Java 的咖啡杯 logo，源自爪哇岛咖啡。",
+  "程序员的三大美德：懒惰、急躁、傲慢。",
+  "代码不会自己跑，但 bug 会自己长。",
+  "「在我电脑上能跑」是程序员的免责声明。",
+  "愿你余生，无需再写 try-catch。",
+  "没有什么是加一层中间件解决不了的，如果有，就加两层。"
+];
+
 function renderLearn() {
   // 顶部统计
   $("#stat-streak").textContent = state.streak;
@@ -380,7 +456,8 @@ function renderLearn() {
     unit.appendChild(unitHeader);
     path.appendChild(unit);
 
-    // 每个lesson一个节点，蛇形排列
+    // 每个lesson一个节点，蛇形排列；收集所有 row 用于在空白侧插装饰
+    const rows = [];
     module.lessons.forEach((lesson, li) => {
       const row = document.createElement("div");
       row.className = "node-row " + (li % 2 === 0 ? "left" : "right");
@@ -406,48 +483,92 @@ function renderLearn() {
       }
       row.appendChild(node);
       path.appendChild(row);
+      rows.push({ el: row, isLeft: li % 2 === 0 });
     });
 
-    // 在该 module 的关卡节点之间散落 1-2 个时代建筑装饰（随机位置）
-    // 使用确定性伪随机（基于 module 索引）以保持稳定
+    // 在该 module 关卡节点的空白侧（节点对面）插入 1-2 个时代建筑装饰
+    // 装饰直接放入对应 node-row，绝对定位到空白侧，避免与节点重叠
     const seed = mi * 7;
-    const decoCount = 1 + (mi % 2); // 1 或 2 个
-    // 每个 node-row 高度约 90px，unit header 约 80px
-    const headerH = 80;
-    const rowH = 90;
+    const decoCount = Math.min(rows.length, 1 + (mi % 2)); // 1 或 2 个，不超过行数
     for (let k = 0; k < decoCount; k++) {
+      // 挑选行：均匀分布 + 伪随机偏移
+      const rowIdx = Math.floor((k + 0.5) * rows.length / decoCount) % rows.length;
+      const target = rows[rowIdx];
       const deco = document.createElement("div");
       deco.className = "era-decoration";
       deco.innerHTML = era.building;
-      // 伪随机：基于 seed+k
+      // 伪随机
       const rnd1 = ((seed + k * 13) % 100) / 100;
       const rnd2 = ((seed + k * 17 + 5) % 100) / 100;
       const rnd3 = ((seed + k * 19 + 9) % 100) / 100;
-      // 宽度 70-110px
-      const w = 70 + Math.round(rnd1 * 40);
-      // 高度 60-90px
-      const h = 60 + Math.round(rnd2 * 30);
-      // 位置：相对 unit 顶部，落在第 1~N-1 个 node-row 之间
-      const totalRows = module.lessons.length;
-      const rowPos = 1 + Math.floor(rnd3 * Math.max(1, totalRows - 1));
-      const top = headerH + rowPos * rowH - h / 2 + (rnd1 - 0.5) * 30;
-      // 横向：左/中/右随机（避免与节点中心冲突）
-      const sideRnd = rnd1;
-      let left;
-      if (sideRnd < 0.33) left = 4 + rnd2 * 10;        // 偏左
-      else if (sideRnd < 0.66) left = 38 + rnd2 * 18;   // 中间
-      else left = 68 + rnd2 * 12;                       // 偏右
+      // 尺寸：节点是 76px，装饰比节点略小 56-70px
+      const w = 56 + Math.round(rnd1 * 14);
+      const h = 56 + Math.round(rnd2 * 14);
+      // 垂直居中到行（行内节点是 76px 高，行有上下 padding/margin 约 90px 总高）
+      // 使用 top: 50% + translateY(-50%) 居中
       deco.style.width = w + "px";
       deco.style.height = h + "px";
-      deco.style.left = left + "%";
-      deco.style.top = top + "px";
-      // 不同装饰的旋转和镜像
-      const rot = (rnd3 - 0.5) * 8;
-      const flip = rnd2 > 0.5 ? "scaleX(-1)" : "scaleX(1)";
-      deco.style.transform = `rotate(${rot}deg) ${flip}`;
-      unit.appendChild(deco);
+      deco.style.top = "50%";
+      deco.style.transform = `translateY(-50%) rotate(${(rnd3 - 0.5) * 8}deg)${rnd2 > 0.5 ? " scaleX(-1)" : ""}`;
+      // 横向：放在节点对侧空白区域
+      // node-row.left: 节点在左（padding-left:14%），空白在右侧 → right: 8%
+      // node-row.right: 节点在右（padding-right:14%），空白在左侧 → left: 8%
+      if (target.isLeft) {
+        const offset = 4 + rnd2 * 10; // 4~14%
+        deco.style.right = offset + "%";
+      } else {
+        const offset = 4 + rnd2 * 10;
+        deco.style.left = offset + "%";
+      }
+      // 点击彩蛋
+      deco.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showEggPopup(eraIdx);
+      });
+      target.el.appendChild(deco);
     }
   });
+}
+
+// ---------- 时代建筑点击彩蛋 ----------
+function showEggPopup(eraIdx) {
+  // 70% 该时代彩蛋，30% 通用彩蛋
+  let pool;
+  if (eraIdx >= 0 && eraIdx < ERA_EGGS.length && Math.random() < 0.7) {
+    pool = ERA_EGGS[eraIdx];
+  } else {
+    pool = GENERAL_EGGS;
+  }
+  const text = pool[Math.floor(Math.random() * pool.length)];
+  const eraName = (ERAS[eraIdx] && ERAS[eraIdx].name) || "Java面试通";
+
+  // 移除已有弹窗
+  document.querySelectorAll(".egg-popup, .egg-overlay").forEach(el => el.remove());
+
+  const overlay = document.createElement("div");
+  overlay.className = "egg-overlay";
+  const popup = document.createElement("div");
+  popup.className = "egg-popup";
+  popup.innerHTML = `
+    <div class="egg-emoji">${EGG_EMOJI}</div>
+    <div class="egg-title">${eraName} · 彩蛋</div>
+    <div class="egg-text">${text}</div>
+    <button class="egg-close">收下彩蛋</button>
+  `;
+  document.body.appendChild(overlay);
+  document.body.appendChild(popup);
+  // 触发动画
+  requestAnimationFrame(() => {
+    overlay.classList.add("show");
+    popup.classList.add("show");
+  });
+  const close = () => {
+    overlay.classList.remove("show");
+    popup.classList.remove("show");
+    setTimeout(() => { overlay.remove(); popup.remove(); }, 250);
+  };
+  popup.querySelector(".egg-close").addEventListener("click", close);
+  overlay.addEventListener("click", close);
 }
 
 // Hero 主题切换按钮

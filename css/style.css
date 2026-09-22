@@ -236,19 +236,89 @@ ul { list-style: none; }
   width: 100%;
   position: relative;
 }
-/* 时代建筑水印：散落在关卡之间，淡灰，不抢眼 */
+/* 时代建筑水印：散落在关卡空白处，淡灰，可点击彩蛋 */
 .era-decoration {
   position: absolute;
-  pointer-events: none;
+  pointer-events: auto;
   z-index: 0;
-  opacity: 0.1;
+  opacity: 0.18;
   filter: grayscale(1);
+  cursor: pointer;
+  transition: opacity .25s, transform .25s;
 }
+.era-decoration:hover { opacity: 0.32; }
+.era-decoration:active { transform: scale(0.92); }
 .era-decoration svg {
   width: 100%;
   height: 100%;
   display: block;
 }
+
+/* ---------- 点击彩蛋弹窗 ---------- */
+.egg-popup {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.7);
+  background: #fff;
+  border-radius: 20px;
+  padding: 22px 20px 18px;
+  width: 78%;
+  max-width: 320px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+}
+.egg-popup.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+.egg-popup .egg-emoji {
+  font-size: 40px;
+  margin-bottom: 8px;
+  animation: eggBounce .5s ease;
+}
+@keyframes eggBounce {
+  0% { transform: scale(0) rotate(-180deg); }
+  60% { transform: scale(1.2) rotate(15deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.egg-popup .egg-title {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--duo-orange);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.egg-popup .egg-text {
+  font-size: 14px;
+  color: var(--text-dark);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.egg-popup .egg-close {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 24px;
+  border-radius: 999px;
+  background: var(--duo-green);
+  color: #fff;
+  box-shadow: 0 3px 0 var(--duo-green-dark);
+}
+.egg-popup .egg-close:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--duo-green-dark); }
+.egg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+.egg-overlay.show { opacity: 1; pointer-events: auto; }
 /* node-row 和 unit-header 都在上层 */
 .unit-header, .node-row { position: relative; z-index: 1; }
 
