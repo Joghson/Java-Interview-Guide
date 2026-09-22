@@ -44,7 +44,7 @@
   <meta name="apple-mobile-web-app-title" content="Java面试通">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-  <link rel="stylesheet" href="css/style.css?v=11">
+  <link rel="stylesheet" href="css/style.css?v=12">
 </head>
 <body>
   <div class="app" id="app">
@@ -162,9 +162,9 @@
 
   </div>
 
-  <script src="js/data.js?v=9"></script>
-  <script src="js/auth.js?v=9"></script>
-  <script src="js/app.js?v=9"></script>
+  <script src="js/data.js?v=10"></script>
+  <script src="js/auth.js?v=10"></script>
+  <script src="js/app.js?v=10"></script>
 
   <!-- ===== Service Worker 注册 + 自动更新检测 ===== -->
   <script>
@@ -180,7 +180,7 @@
           await Promise.all(keys.map(k => caches.delete(k)));
         } catch(e) {}
 
-        navigator.serviceWorker.register("sw.js?v=7")
+        navigator.serviceWorker.register("sw.js?v=8")
           .then((reg) => {
             console.log("✅ SW 已注册", reg.scope);
             reg.addEventListener("updatefound", () => {

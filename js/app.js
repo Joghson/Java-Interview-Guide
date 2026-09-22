@@ -126,9 +126,197 @@ $$(".tab").forEach(tab => {
 
 // ---------- 渲染：学习路径 ----------
 // 时代映射：每个模块对应一个时代（从原始到数字）
+// 每个时代有：名称、副标题、天空渐变色、标志性建筑 SVG
 const ERAS = [
-  "原始时代", "农耕时代", "古代文明", "中世纪", "大航海",
-  "工业革命", "蒸汽时代", "电气时代", "信息时代", "数字时代"
+  {
+    name: "原始时代",
+    desc: "钻木取火 · 洞穴壁画",
+    sky: "linear-gradient(180deg, #3d2817 0%, #6b4a2a 60%, #8a5a2a 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <path d="M0 90 L0 50 Q40 30 80 50 L120 50 Q160 30 200 50 L200 90 Z" fill="#2a1810"/>
+      <circle cx="80" cy="40" r="14" fill="#1a0e08"/>
+      <circle cx="80" cy="40" r="10" fill="#3a2410"/>
+      <path d="M50 90 Q55 60 60 90 M140 90 Q145 65 150 90" stroke="#ff6b20" stroke-width="3" fill="none"/>
+      <circle cx="55" cy="58" r="2" fill="#ff9500"/><circle cx="145" cy="63" r="2" fill="#ff9500"/>
+    </svg>`
+  },
+  {
+    name: "农耕时代",
+    desc: "刀耕火种 · 麦浪茅屋",
+    sky: "linear-gradient(180deg, #d4a040 0%, #c89030 60%, #a07020 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <path d="M0 90 L0 70 Q100 60 200 70 L200 90 Z" fill="#8a6020"/>
+      <path d="M40 90 L40 55 L60 40 L80 55 L80 90 Z" fill="#6b4a1a"/>
+      <path d="M30 55 L70 55 L50 35 Z" fill="#a07030"/>
+      <rect x="48" y="65" width="8" height="10" fill="#3a2410"/>
+      <path d="M100 90 L100 60 L120 45 L140 60 L140 90 Z" fill="#5a4015"/>
+      <path d="M90 60 L150 60 L120 40 Z" fill="#8a6020"/>
+      <path d="M0 75 Q50 73 100 75 Q150 77 200 75" stroke="#c8a040" stroke-width="2" fill="none"/>
+    </svg>`
+  },
+  {
+    name: "古代文明",
+    desc: "四大文明 · 金字塔神庙",
+    sky: "linear-gradient(180deg, #e8c870 0%, #d4a040 60%, #a87020 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <path d="M20 90 L60 35 L100 90 Z" fill="#c89030"/>
+      <path d="M60 90 L60 35 L100 90 Z" fill="#a87020"/>
+      <path d="M0 90 L0 75 Q30 72 60 75 L60 90 Z" fill="#8a6020"/>
+      <path d="M110 90 L130 50 L150 90 Z" fill="#c89030"/>
+      <rect x="125" y="60" width="10" height="30" fill="#3a2410"/>
+      <rect x="160" y="70" width="30" height="20" fill="#a87020"/>
+      <rect x="170" y="55" width="10" height="35" fill="#8a6020"/>
+      <circle cx="175" cy="50" r="6" fill="#e8c870"/>
+    </svg>`
+  },
+  {
+    name: "中世纪",
+    desc: "骑士城堡 · 哥特尖塔",
+    sky: "linear-gradient(180deg, #5a4030 0%, #4a3020 60%, #2a1810 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <rect x="30" y="50" width="100" height="40" fill="#6a5040"/>
+      <rect x="20" y="40" width="15" height="50" fill="#5a4030"/>
+      <rect x="125" y="40" width="15" height="50" fill="#5a4030"/>
+      <path d="M20 40 L20 30 L35 30 L35 40 M125 40 L125 30 L140 30 L140 40" fill="#3a2820"/>
+      <path d="M60 50 L60 20 L70 10 L80 20 L80 50 Z" fill="#8a6850"/>
+      <path d="M65 25 L75 25 L70 15 Z" fill="#c8a060"/>
+      <rect x="68" y="30" width="4" height="20" fill="#3a2820"/>
+      <rect x="50" y="65" width="10" height="15" fill="#2a1810"/>
+      <rect x="90" y="65" width="10" height="15" fill="#2a1810"/>
+      <path d="M150 90 L150 55 L170 45 L190 55 L190 90 Z" fill="#6a5040"/>
+      <rect x="165" y="65" width="10" height="25" fill="#2a1810"/>
+    </svg>`
+  },
+  {
+    name: "大航海",
+    desc: "地理大发现 · 帆船罗盘",
+    sky: "linear-gradient(180deg, #4a90c8 0%, #2a6a9a 60%, #1a4570 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <path d="M0 90 Q50 85 100 90 Q150 95 200 90 L200 75 Q100 70 0 75 Z" fill="#1a4570" opacity="0.5"/>
+      <path d="M40 90 L30 70 L150 70 L160 90 Z" fill="#6b4a2a"/>
+      <line x1="90" y1="70" x2="90" y2="15" stroke="#3a2810" stroke-width="2"/>
+      <path d="M90 25 L90 55 L60 55 Z" fill="#f5f0e0"/>
+      <path d="M90 25 L90 55 L120 55 Z" fill="#e8e0c8"/>
+      <path d="M90 35 L90 60 L65 60 Z" fill="#f5f0e0"/>
+      <path d="M90 35 L90 60 L115 60 Z" fill="#e8e0c8"/>
+      <path d="M0 80 Q30 78 60 80 Q90 82 120 80 Q150 78 180 80" stroke="#fff" stroke-width="1.5" fill="none" opacity="0.6"/>
+      <path d="M0 85 Q40 83 80 85 Q120 87 160 85" stroke="#fff" stroke-width="1" fill="none" opacity="0.4"/>
+    </svg>`
+  },
+  {
+    name: "工业革命",
+    desc: "机器轰鸣 · 工厂烟囱",
+    sky: "linear-gradient(180deg, #8a8580 0%, #6a6560 60%, #3a3835 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <rect x="20" y="50" width="120" height="40" fill="#4a4540"/>
+      <rect x="40" y="20" width="12" height="70" fill="#5a5550"/>
+      <rect x="70" y="15" width="14" height="75" fill="#5a5550"/>
+      <rect x="100" y="25" width="10" height="65" fill="#5a5550"/>
+      <ellipse cx="46" cy="18" rx="10" ry="6" fill="#3a3530" opacity="0.7"/>
+      <ellipse cx="77" cy="12" rx="12" ry="7" fill="#3a3530" opacity="0.6"/>
+      <ellipse cx="105" cy="22" rx="8" ry="5" fill="#3a3530" opacity="0.7"/>
+      <rect x="30" y="65" width="20" height="15" fill="#2a2520"/>
+      <rect x="60" y="60" width="25" height="20" fill="#2a2520"/>
+      <circle cx="90" cy="70" r="8" fill="#1a1815"/>
+      <circle cx="90" cy="70" r="5" fill="#4a4540"/>
+      <path d="M85 70 L95 70 M90 65 L90 75" stroke="#2a2520" stroke-width="2"/>
+    </svg>`
+  },
+  {
+    name: "蒸汽时代",
+    desc: "钢铁巨兽 · 蒸汽火车",
+    sky: "linear-gradient(180deg, #7a8590 0%, #5a6570 60%, #3a4550 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <rect x="0" y="75" width="200" height="15" fill="#3a3530"/>
+      <rect x="20" y="55" width="80" height="25" fill="#2a2520"/>
+      <rect x="100" y="45" width="30" height="35" fill="#3a3530"/>
+      <circle cx="35" cy="80" r="10" fill="#1a1815"/>
+      <circle cx="60" cy="80" r="10" fill="#1a1815"/>
+      <circle cx="115" cy="80" r="8" fill="#1a1815"/>
+      <circle cx="35" cy="80" r="4" fill="#5a5550"/>
+      <circle cx="60" cy="80" r="4" fill="#5a5550"/>
+      <rect x="30" y="50" width="15" height="8" fill="#c83030"/>
+      <rect x="110" y="35" width="10" height="12" fill="#2a2520"/>
+      <path d="M115 35 Q110 25 120 20 Q115 15 125 10" stroke="#fff" stroke-width="3" fill="none" opacity="0.7"/>
+      <ellipse cx="118" cy="8" rx="8" ry="4" fill="#fff" opacity="0.5"/>
+      <rect x="140" y="60" width="50" height="20" fill="#4a4540"/>
+      <rect x="145" y="65" width="8" height="10" fill="#c8a060"/>
+      <rect x="160" y="65" width="8" height="10" fill="#c8a060"/>
+    </svg>`
+  },
+  {
+    name: "电气时代",
+    desc: "光明降临 · 电塔灯泡",
+    sky: "linear-gradient(180deg, #d4a050 0%, #b08030 60%, #7a5010 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <path d="M30 90 L50 30 L70 90 Z" fill="#5a4530"/>
+      <path d="M50 30 L50 90 M40 50 L60 50 M35 70 L65 70" stroke="#3a2810" stroke-width="2"/>
+      <path d="M120 90 L140 35 L160 90 Z" fill="#5a4530"/>
+      <path d="M140 35 L140 90 M130 55 L150 55 M125 75 L155 75" stroke="#3a2810" stroke-width="2"/>
+      <path d="M50 30 Q50 80 140 35" stroke="#2a1810" stroke-width="1.5" fill="none"/>
+      <ellipse cx="95" cy="55" rx="20" ry="22" fill="#fff8d0" opacity="0.9"/>
+      <ellipse cx="95" cy="55" rx="14" ry="16" fill="#fff" opacity="0.7"/>
+      <rect x="88" y="73" width="14" height="10" fill="#5a4530"/>
+      <path d="M95 40 L92 52 L98 52 L95 64" stroke="#d4a050" stroke-width="2.5" fill="none"/>
+    </svg>`
+  },
+  {
+    name: "信息时代",
+    desc: "字节跳动 · 服务器机房",
+    sky: "linear-gradient(180deg, #2a8a5a 0%, #1a6a3a 60%, #0d4a20 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <rect x="20" y="20" width="50" height="70" fill="#2a2a2a"/>
+      <rect x="25" y="28" width="40" height="8" fill="#1a8a3a"/>
+      <rect x="25" y="40" width="40" height="8" fill="#1a8a3a"/>
+      <rect x="25" y="52" width="40" height="8" fill="#1a8a3a"/>
+      <rect x="25" y="64" width="40" height="8" fill="#1a8a3a"/>
+      <rect x="25" y="76" width="40" height="8" fill="#1a8a3a"/>
+      <circle cx="30" cy="32" r="1.5" fill="#5eff90"/>
+      <circle cx="30" cy="44" r="1.5" fill="#5eff90"/>
+      <circle cx="30" cy="56" r="1.5" fill="#ff5050"/>
+      <circle cx="30" cy="68" r="1.5" fill="#5eff90"/>
+      <rect x="80" y="35" width="50" height="55" fill="#1a1a1a"/>
+      <rect x="85" y="42" width="40" height="6" fill="#0d8a3a"/>
+      <rect x="85" y="52" width="40" height="6" fill="#0d8a3a"/>
+      <rect x="85" y="62" width="40" height="6" fill="#0d8a3a"/>
+      <rect x="85" y="72" width="40" height="6" fill="#0d8a3a"/>
+      <rect x="140" y="25" width="45" height="65" fill="#2a2a2a"/>
+      <rect x="145" y="32" width="35" height="7" fill="#1a8a3a"/>
+      <rect x="145" y="43" width="35" height="7" fill="#1a8a3a"/>
+      <rect x="145" y="54" width="35" height="7" fill="#1a8a3a"/>
+      <rect x="145" y="65" width="35" height="7" fill="#1a8a3a"/>
+      <rect x="145" y="76" width="35" height="7" fill="#1a8a3a"/>
+    </svg>`
+  },
+  {
+    name: "数字时代",
+    desc: "云端互联 · 摩天大楼",
+    sky: "linear-gradient(180deg, #2a5aaa 0%, #1a4588 60%, #0d3070 100%)",
+    building: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMax slice">
+      <rect x="10" y="40" width="25" height="50" fill="#1a3a6a"/>
+      <rect x="13" y="45" width="3" height="3" fill="#5aaaff"/><rect x="19" y="45" width="3" height="3" fill="#5aaaff"/><rect x="25" y="45" width="3" height="3" fill="#5aaaff"/>
+      <rect x="13" y="52" width="3" height="3" fill="#5aaaff"/><rect x="19" y="52" width="3" height="3" fill="#5aaaff"/><rect x="25" y="52" width="3" height="3" fill="#5aaaff"/>
+      <rect x="13" y="59" width="3" height="3" fill="#5aaaff"/><rect x="19" y="59" width="3" height="3" fill="#5aaaff"/><rect x="25" y="59" width="3" height="3" fill="#5aaaff"/>
+      <rect x="40" y="25" width="30" height="65" fill="#2a4a8a"/>
+      <rect x="44" y="30" width="3" height="3" fill="#7abfff"/><rect x="50" y="30" width="3" height="3" fill="#7abfff"/><rect x="56" y="30" width="3" height="3" fill="#7abfff"/><rect x="62" y="30" width="3" height="3" fill="#7abfff"/>
+      <rect x="44" y="38" width="3" height="3" fill="#7abfff"/><rect x="50" y="38" width="3" height="3" fill="#5aaaff"/><rect x="56" y="38" width="3" height="3" fill="#7abfff"/><rect x="62" y="38" width="3" height="3" fill="#7abfff"/>
+      <rect x="44" y="46" width="3" height="3" fill="#7abfff"/><rect x="50" y="46" width="3" height="3" fill="#7abfff"/><rect x="56" y="46" width="3" height="3" fill="#5aaaff"/><rect x="62" y="46" width="3" height="3" fill="#7abfff"/>
+      <rect x="75" y="15" width="35" height="75" fill="#1a3a6a"/>
+      <rect x="79" y="20" width="3" height="3" fill="#5aaaff"/><rect x="85" y="20" width="3" height="3" fill="#aaddff"/><rect x="91" y="20" width="3" height="3" fill="#5aaaff"/><rect x="97" y="20" width="3" height="3" fill="#5aaaff"/><rect x="103" y="20" width="3" height="3" fill="#5aaaff"/>
+      <rect x="79" y="28" width="3" height="3" fill="#aaddff"/><rect x="85" y="28" width="3" height="3" fill="#5aaaff"/><rect x="91" y="28" width="3" height="3" fill="#5aaaff"/><rect x="97" y="28" width="3" height="3" fill="#aaddff"/><rect x="103" y="28" width="3" height="3" fill="#5aaaff"/>
+      <rect x="79" y="36" width="3" height="3" fill="#5aaaff"/><rect x="85" y="36" width="3" height="3" fill="#5aaaff"/><rect x="91" y="36" width="3" height="3" fill="#5aaaff"/><rect x="97" y="36" width="3" height="3" fill="#5aaaff"/><rect x="103" y="36" width="3" height="3" fill="#aaddff"/>
+      <rect x="79" y="44" width="3" height="3" fill="#5aaaff"/><rect x="85" y="44" width="3" height="3" fill="#aaddff"/><rect x="91" y="44" width="3" height="3" fill="#5aaaff"/><rect x="97" y="44" width="3" height="3" fill="#5aaaff"/><rect x="103" y="44" width="3" height="3" fill="#5aaaff"/>
+      <rect x="79" y="52" width="3" height="3" fill="#5aaaff"/><rect x="85" y="52" width="3" height="3" fill="#5aaaff"/><rect x="91" y="52" width="3" height="3" fill="#aaddff"/><rect x="97" y="52" width="3" height="3" fill="#5aaaff"/><rect x="103" y="52" width="3" height="3" fill="#5aaaff"/>
+      <rect x="115" y="30" width="25" height="60" fill="#2a4a8a"/>
+      <rect x="119" y="35" width="3" height="3" fill="#7abfff"/><rect x="125" y="35" width="3" height="3" fill="#7abfff"/><rect x="131" y="35" width="3" height="3" fill="#7abfff"/>
+      <rect x="119" y="43" width="3" height="3" fill="#7abfff"/><rect x="125" y="43" width="3" height="3" fill="#5aaaff"/><rect x="131" y="43" width="3" height="3" fill="#7abfff"/>
+      <rect x="145" y="20" width="40" height="70" fill="#1a3a6a"/>
+      <rect x="149" y="25" width="3" height="3" fill="#5aaaff"/><rect x="155" y="25" width="3" height="3" fill="#aaddff"/><rect x="161" y="25" width="3" height="3" fill="#5aaaff"/><rect x="167" y="25" width="3" height="3" fill="#5aaaff"/><rect x="173" y="25" width="3" height="3" fill="#5aaaff"/><rect x="179" y="25" width="3" height="3" fill="#5aaaff"/>
+      <rect x="149" y="33" width="3" height="3" fill="#aaddff"/><rect x="155" y="33" width="3" height="3" fill="#5aaaff"/><rect x="161" y="33" width="3" height="3" fill="#5aaaff"/><rect x="167" y="33" width="3" height="3" fill="#aaddff"/><rect x="173" y="33" width="3" height="3" fill="#5aaaff"/><rect x="179" y="33" width="3" height="3" fill="#5aaaff"/>
+      <rect x="149" y="41" width="3" height="3" fill="#5aaaff"/><rect x="155" y="41" width="3" height="3" fill="#5aaaff"/><rect x="161" y="41" width="3" height="3" fill="#5aaaff"/><rect x="167" y="41" width="3" height="3" fill="#5aaaff"/><rect x="173" y="41" width="3" height="3" fill="#aaddff"/><rect x="179" y="41" width="3" height="3" fill="#5aaaff"/>
+      <rect x="149" y="49" width="3" height="3" fill="#5aaaff"/><rect x="155" y="49" width="3" height="3" fill="#aaddff"/><rect x="161" y="49" width="3" height="3" fill="#5aaaff"/><rect x="167" y="49" width="3" height="3" fill="#5aaaff"/><rect x="173" y="49" width="3" height="3" fill="#5aaaff"/><rect x="179" y="49" width="3" height="3" fill="#5aaaff"/>
+    </svg>`
+  }
 ];
 
 function renderLearn() {
@@ -174,19 +362,36 @@ function renderLearn() {
     const unit = document.createElement("div");
     unit.className = "unit";
     const eraIdx = Math.min(mi, ERAS.length - 1);
+    const era = ERAS[eraIdx];
     unit.setAttribute("data-era", String(eraIdx));
     const doneInModule = module.lessons.filter(l => state.completedLessons[l.id]).length;
-    unit.innerHTML = `
-      <div class="unit-header${moduleLocked ? " locked" : ""}">
-        <div class="u-icon">${module.icon}</div>
-        <div>
-          <div class="u-title">${module.module}</div>
-          <div class="u-sub">${doneInModule}/${module.lessons.length} 关 · ${ERAS[eraIdx]}</div>
-        </div>
-        <span class="era-tag">${ERAS[eraIdx]}</span>
-        ${moduleLocked ? '<div class="u-lock">🔒</div>' : ""}
+
+    // 时代横幅（每个大关卡前显示，带标志性建筑）
+    const eraBanner = document.createElement("div");
+    eraBanner.className = "era-banner";
+    eraBanner.style.background = era.sky;
+    eraBanner.innerHTML = `
+      <div class="era-building">${era.building}</div>
+      <div class="era-info">
+        <div class="era-name">${era.name}</div>
+        <div class="era-desc">${era.desc}</div>
       </div>
+      <div class="era-num">${String(eraIdx + 1).padStart(2, "0")}</div>
     `;
+    unit.appendChild(eraBanner);
+
+    // 单元头
+    const unitHeader = document.createElement("div");
+    unitHeader.className = "unit-header" + (moduleLocked ? " locked" : "");
+    unitHeader.innerHTML = `
+      <div class="u-icon">${module.icon}</div>
+      <div>
+        <div class="u-title">${module.module}</div>
+        <div class="u-sub">${doneInModule}/${module.lessons.length} 关已通过</div>
+      </div>
+      ${moduleLocked ? '<div class="u-lock">🔒</div>' : ""}
+    `;
+    unit.appendChild(unitHeader);
     path.appendChild(unit);
 
     // 每个lesson一个节点，蛇形排列
